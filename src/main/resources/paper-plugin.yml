@@ -2,7 +2,7 @@ name: Enchantio
 version: '${project.version}'
 main: me.youhavetrouble.enchantio.Enchantio
 bootstrapper: me.youhavetrouble.enchantio.EnchantioBootstrap
-api-version: '1.21.5'
+api-version: '1.21.9'
 authors: [YouHaveTrouble]
 description: Custom enchants for paper servers
 website: https://youhavetrouble.me
