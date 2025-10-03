@@ -42,7 +42,7 @@ public class EnchantioBootstrap implements PluginBootstrap {
             }
         }));
 
-        context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.freeze().newHandler(event -> {
+        context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.compose().newHandler(event -> {
             for (EnchantioEnchant enchant : enchantioEnchants) {
                 logger.info("Registering enchantment {}", enchant.getKey());
                 event.registry().register(TypedKey.create(RegistryKey.ENCHANTMENT, enchant.getKey()), enchantment -> {
