@@ -3,8 +3,10 @@ package me.youhavetrouble.enchantio.listeners;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 
+import me.youhavetrouble.enchantio.Enchantio;
 import me.youhavetrouble.enchantio.EnchantioConfig;
 import me.youhavetrouble.enchantio.enchants.TelepathyEnchant;
+import org.bukkit.Bukkit;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -28,11 +30,16 @@ public class TelepathyListener implements Listener {
         ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
         if (!tool.containsEnchantment(telepathy)) return;
         for (Item item : event.getItems()) {
-            item.teleport(event.getPlayer(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             item.setPickupDelay(0);
             if (!telepathyEnchant.isOnlyUserCanPickupItems()) continue;
             item.setOwner(event.getPlayer().getUniqueId());
         }
+
+        // If there's ever a performance problem here, it's the following
+        Bukkit.getScheduler().runTask(Enchantio.getPlugin(Enchantio.class), () -> event.getItems().forEach((item) -> {
+            if (item == null || item.isDead()) return;
+            item.teleport(event.getPlayer(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+        }));
     }
 
 }
