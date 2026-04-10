@@ -3,7 +3,6 @@ package me.youhavetrouble.enchantio.listeners;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import me.youhavetrouble.enchantio.EnchantioConfig;
-import me.youhavetrouble.enchantio.enchants.ExecutionerEnchant;
 import me.youhavetrouble.enchantio.enchants.VolleyEnchant;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
@@ -41,7 +40,7 @@ public class VolleyListener implements Listener {
         ItemStack bow = equipment.getItemInMainHand();
         int level = bow.getEnchantmentLevel(volley);
         if (level <= 0) return;
-        if (!(EnchantioConfig.ENCHANTS.get(ExecutionerEnchant.KEY) instanceof VolleyEnchant volleyEnchant)) return;
+        if (!(EnchantioConfig.ENCHANTS.get(VolleyEnchant.KEY) instanceof VolleyEnchant volleyEnchant)) return;
         double spread = volleyEnchant.getSpread();
         if (projectileEntity instanceof Arrow arrow) {
             for (int i = 0; i < level * volleyEnchant.getAdditionalArrowsPerLevel(); i++) {
@@ -64,7 +63,6 @@ public class VolleyListener implements Listener {
             return;
         }
         if (projectileEntity instanceof SpectralArrow arrow) {
-            arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
             for (int i = 0; i < level; i++) {
                 Vector velocity = arrow.getVelocity();
                 double spreadX = (random.nextDouble() - 0.5) * spread;
