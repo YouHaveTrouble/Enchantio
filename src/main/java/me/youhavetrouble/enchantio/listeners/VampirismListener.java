@@ -37,7 +37,7 @@ public class VampirismListener implements Listener {
                     }
 
                     player.setFireTicks(Math.max(fireTicks, player.getMaxFireTicks()));
-                }, () -> {}, 1);
+                }, () -> {}, 0);
             }
 
         }, 1, 20);
