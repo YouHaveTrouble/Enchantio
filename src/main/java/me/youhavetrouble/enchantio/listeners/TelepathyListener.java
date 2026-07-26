@@ -6,7 +6,6 @@ import io.papermc.paper.registry.RegistryKey;
 import me.youhavetrouble.enchantio.Enchantio;
 import me.youhavetrouble.enchantio.EnchantioConfig;
 import me.youhavetrouble.enchantio.enchants.TelepathyEnchant;
-import org.bukkit.Bukkit;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -36,10 +35,14 @@ public class TelepathyListener implements Listener {
         }
 
         // If there's ever a performance problem here, it's the following
-        Bukkit.getScheduler().runTask(Enchantio.getPlugin(Enchantio.class), () -> event.getItems().forEach((item) -> {
-            if (item == null || item.isDead()) return;
-            item.teleport(event.getPlayer(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-        }));
+        Enchantio enchantio = Enchantio.getPlugin(Enchantio.class);
+        event.getItems().forEach((item) -> {
+            if (item == null) return;
+            item.getScheduler().run(enchantio, (task) -> {
+                if (item.isDead()) return;
+                item.teleport(event.getPlayer(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }, null);
+        });
     }
 
 }

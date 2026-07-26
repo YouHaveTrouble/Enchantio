@@ -60,6 +60,7 @@ public class SmeltingListener implements Listener {
             smeltingCache.put(singleItem, result);
             return result;
         }
+        smeltingCache.put(singleItem, null);
         return null;
     }
 

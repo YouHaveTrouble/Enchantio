@@ -19,22 +19,25 @@ public class VampirismListener implements Listener {
 
     public VampirismListener() {
         if (vampirism == null) return;
-        Bukkit.getGlobalRegionScheduler().runAtFixedRate(Enchantio.getPlugin(Enchantio.class), (task) -> {
+        Enchantio enchantio = Enchantio.getPlugin(Enchantio.class);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(enchantio, (task) -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 boolean hasVampirism = Enchantio.getSumOfEnchantLevels(player.getEquipment(), vampirism) != 0;
-                if (!hasVampirism) return;
-                Location abovePlayer = player.getLocation().add(0, player.getEyeHeight() + 0.5, 0);
-                Block block = player.getWorld().getBlockAt(abovePlayer);
-                byte light = block.getLightFromSky();
-                if (light < 15) return;
-                int fireTicks = player.getFireTicks();
+                if (!hasVampirism) continue;
+                player.getScheduler().execute(enchantio, () -> {
+                    Location abovePlayer = player.getLocation().add(0, player.getEyeHeight() + 0.5, 0);
+                    Block block = player.getWorld().getBlockAt(abovePlayer);
+                    byte light = block.getLightFromSky();
+                    if (light < 15) return;
+                    int fireTicks = player.getFireTicks();
 
-                // Prefent fire animation from disappearing on the client
-                if (player.getFireTicks() < 20) {
-                    fireTicks = 25;
-                }
+                    // Prefent fire animation from disappearing on the client
+                    if (player.getFireTicks() < 20) {
+                        fireTicks = 25;
+                    }
 
-                player.setFireTicks(Math.max(fireTicks, player.getMaxFireTicks()));
+                    player.setFireTicks(Math.max(fireTicks, player.getMaxFireTicks()));
+                }, () -> {}, 0);
             }
 
         }, 1, 20);

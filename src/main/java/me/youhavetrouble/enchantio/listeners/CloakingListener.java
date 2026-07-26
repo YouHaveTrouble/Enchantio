@@ -26,7 +26,7 @@ import java.util.UUID;
 
 public class CloakingListener implements Listener {
 
-    private final HashMap<UUID, Long> ticksSinceLastMovement = new HashMap<>();
+    private final HashMap<UUID, Integer> ticksSinceLastMovement = new HashMap<>();
 
     private final CloakingEnchant cloakingEnchant = (CloakingEnchant) EnchantioConfig.ENCHANTS.get(CloakingEnchant.KEY);
     private final PotionEffect cloakingEffect = new PotionEffect(PotionEffectType.INVISIBILITY,  3, 0, false, false, false);
@@ -40,13 +40,13 @@ public class CloakingListener implements Listener {
         Bukkit.getGlobalRegionScheduler().runAtFixedRate(enchantio, (task) -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.isSneaking()) {
-                    ticksSinceLastMovement.put(player.getUniqueId(), 0L);
+                    ticksSinceLastMovement.put(player.getUniqueId(), 0);
                     continue;
                 }
                 int cloakingLevel = Enchantio.getSumOfEnchantLevels(player.getEquipment(), cloaking);
                 if (cloakingLevel == 0) continue;
                 ticksSinceLastMovement.computeIfPresent(player.getUniqueId(), (uuid, ticks) -> ticks + 1);
-                if (ticksSinceLastMovement.getOrDefault(player.getUniqueId(), 0L) < cloakingEnchant.getTicksToActivate()) continue;
+                if (ticksSinceLastMovement.getOrDefault(player.getUniqueId(), 0) < cloakingEnchant.getTicksToActivate()) continue;
                 player.getScheduler().execute(enchantio, () -> player.addPotionEffect(cloakingEffect), () -> {}, 1);
             }
         }, 1, 1);
@@ -54,7 +54,7 @@ public class CloakingListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0L);
+        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -65,17 +65,17 @@ public class CloakingListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
-        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0L);
+        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerJump(PlayerJumpEvent event) {
-        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0L);
+        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0L);
+        ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0);
     }
 
 
