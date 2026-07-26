@@ -3,6 +3,7 @@ version: '${project.version}'
 main: me.youhavetrouble.enchantio.Enchantio
 bootstrapper: me.youhavetrouble.enchantio.EnchantioBootstrap
 api-version: '1.21.9'
+folia-supported: true
 authors: [YouHaveTrouble]
 description: Custom enchants for paper servers
 website: https://youhavetrouble.me
