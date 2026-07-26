@@ -50,8 +50,7 @@ public class SmeltingListener implements Listener {
      */
     private ItemStack getSmeltedItem(@NotNull ItemStack itemStack) {
         ItemStack singleItem = itemStack.asOne();
-        ItemStack cached = smeltingCache.get(singleItem);
-        if (cached != null || smeltingCache.containsKey(singleItem)) return cached;
+        if (smeltingCache.containsKey(singleItem)) return smeltingCache.get(singleItem);
 
         for (@NotNull Iterator<Recipe> it = Bukkit.recipeIterator(); it.hasNext(); ) {
             Recipe recipe = it.next();
