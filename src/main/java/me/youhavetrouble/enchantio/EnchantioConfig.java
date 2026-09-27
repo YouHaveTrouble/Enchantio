@@ -80,6 +80,9 @@ public class EnchantioConfig {
         ConfigurationSection wardSection = getConfigSection(enchantsSection, "ward");
         WardEnchant.create(wardSection);
 
+        ConfigurationSection tunnellingSection = getConfigSection(enchantsSection, "tunnelling");
+        TunnellingEnchant.create(tunnellingSection);
+
         ConfigurationSection cursesSection = getConfigSection(configuration, "curses");
         migrateEnchantTags(cursesSection);
 
@@ -223,16 +226,16 @@ public class EnchantioConfig {
                     TagKey<BlockType> tagKey = BlockTypeTagKeys.create(key);
                     TagEntry<BlockType> tagEntry = TagEntry.tagEntry(tagKey);
                     blockTagKeys.add(tagEntry);
-                }  catch (IllegalArgumentException ignored) {
+                } catch (IllegalArgumentException e) {
                 }
                 continue;
             }
             try {
                 Key key = Key.key(blockTag);
-                TagKey<BlockType> tagKey = BlockTypeTagKeys.create(key);
-                TagEntry<BlockType> tagEntry = TagEntry.tagEntry(tagKey);
+                TypedKey<BlockType> typedKey = TypedKey.create(RegistryKey.BLOCK, key);
+                TagEntry<BlockType> tagEntry = TagEntry.valueEntry(typedKey);
                 blockTagKeys.add(tagEntry);
-            }  catch (IllegalArgumentException | NullPointerException ignored) {
+            } catch (IllegalArgumentException | NullPointerException e) {
             }
         }
         return blockTagKeys;

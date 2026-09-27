@@ -20,33 +20,40 @@ import static me.youhavetrouble.enchantio.EnchantioConfig.ENCHANTS;
 @SuppressWarnings("UnstableApiUsage")
 public class TunnellingEnchant implements EnchantioEnchant {
 
-    public static final Key KEY = Key.key("enchantio:tunnelling");
+    public static final Key KEY = Key.key("enchantio", "tunnelling");
 
-    private final int anvilCost, weight, maxLevel;
+    public static final Key AFFECTED_BLOCKS_KEY = Key.key("enchantio", "affected_by_tunnelling");
+
+    private final int anvilCost, weight, maxLevel, blocksPerLevel;
+    private final boolean canBreakToolIncompatibleBlocks;
     private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
     private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
     private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
     private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagEntry<BlockType>> blockTagKeys = new HashSet<>();
+    private final Map<Key, Set<TagEntry<BlockType>>> affectedBlockTags = new HashMap<>();
 
-    public TunnellingEnchant(
+    private TunnellingEnchant(
             int anvilCost,
             int weight,
             EnchantmentRegistryEntry.EnchantmentCost minimumCost,
             EnchantmentRegistryEntry.EnchantmentCost maximumCost,
             Collection<TagKey<Enchantment>> enchantTagKeys,
             Collection<TagEntry<ItemType>> supportedItemTags,
-            Collection<TagEntry<BlockType>> supportedBlockTags,
-            int maxLevel
+            Map<Key, Set<TagEntry<BlockType>>> affectedBlockTags,
+            int maxLevel,
+            int blocksPerLevel,
+            boolean canBreakToolIncompatibleBlocks
     ) {
         this.anvilCost = anvilCost;
         this.weight = weight;
         this.minimumCost = minimumCost;
         this.maximumCost = maximumCost;
         this.maxLevel = maxLevel;
+        this.blocksPerLevel = blocksPerLevel;
+        this.canBreakToolIncompatibleBlocks = canBreakToolIncompatibleBlocks;
         this.supportedItemTags.addAll(supportedItemTags);
         this.enchantTagKeys.addAll(enchantTagKeys);
-        this.blockTagKeys.addAll(supportedBlockTags);
+        this.affectedBlockTags.putAll(affectedBlockTags);
     }
 
     @Override
@@ -99,6 +106,18 @@ public class TunnellingEnchant implements EnchantioEnchant {
         return Collections.unmodifiableSet(enchantTagKeys);
     }
 
+    @Override
+    public @NotNull Map<Key, Set<TagEntry<BlockType>>> getBlockTagsToRegister() {
+        return affectedBlockTags;
+    }
+
+    public int getBlocksPerLevel() {
+        return blocksPerLevel;
+    }
+
+    public boolean canBreakToolIncompatibleBlocks() {
+        return canBreakToolIncompatibleBlocks;
+    }
 
     public static TunnellingEnchant create(ConfigurationSection configurationSection) {
         TunnellingEnchant tunnellingEnchant = new TunnellingEnchant(
@@ -124,17 +143,22 @@ public class TunnellingEnchant implements EnchantioEnchant {
                                 "#minecraft:enchantable/mining"
                         )
                 )),
-                EnchantioConfig.getBlockTagKeysFromList(EnchantioConfig.getStringList(
-                        configurationSection,
-                        "mineableBlockTags",
-                        List.of(
-                                "#minecraft:base_stone_overworld",
-                                "#minecraft:base_stone_nether",
-                                "#minecraft:ores",
-                                "minecraft:end_stone"
-                        )
-                )),
-                EnchantioConfig.getInt(configurationSection, "maxLevel", 1)
+                Map.of(
+                        AFFECTED_BLOCKS_KEY,
+                        EnchantioConfig.getBlockTagKeysFromList(EnchantioConfig.getStringList(
+                                configurationSection,
+                                "affectedBlockTags",
+                                List.of(
+                                        "#minecraft:base_stone_overworld",
+                                        "#minecraft:base_stone_nether",
+                                        "#minecraft:ores",
+                                        "minecraft:end_stone"
+                                )
+                        ))
+                ),
+                EnchantioConfig.getInt(configurationSection, "maxLevel", 1),
+                EnchantioConfig.getInt(configurationSection, "blocksPerLevel", 1),
+                EnchantioConfig.getBoolean(configurationSection, "canBreakToolIncompatibleBlocks", false)
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
