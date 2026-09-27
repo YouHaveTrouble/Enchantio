@@ -2,12 +2,14 @@ package me.youhavetrouble.enchantio;
 
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
 import io.papermc.paper.registry.keys.tags.EnchantmentTagKeys;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.TagEntry;
 import me.youhavetrouble.enchantio.enchants.*;
 import net.kyori.adventure.key.Key;
+import org.bukkit.block.BlockType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -77,6 +79,9 @@ public class EnchantioConfig {
 
         ConfigurationSection wardSection = getConfigSection(enchantsSection, "ward");
         WardEnchant.create(wardSection);
+
+        ConfigurationSection tunnellingSection = getConfigSection(enchantsSection, "tunnelling");
+        TunnellingEnchant.create(tunnellingSection);
 
         ConfigurationSection cursesSection = getConfigSection(configuration, "curses");
         migrateEnchantTags(cursesSection);
@@ -208,6 +213,32 @@ public class EnchantioConfig {
             }
         }
         return enchantTagKeys;
+    }
+
+    public static Set<TagEntry<BlockType>> getBlockTagKeysFromList(@NotNull List<String> tags) {
+        Set<TagEntry<BlockType>> blockTagKeys = new HashSet<>();
+        for (String blockTag : tags) {
+            if (blockTag == null) continue;
+            if (blockTag.startsWith("#")) {
+                blockTag = blockTag.substring(1);
+                try {
+                    Key key = Key.key(blockTag);
+                    TagKey<BlockType> tagKey = BlockTypeTagKeys.create(key);
+                    TagEntry<BlockType> tagEntry = TagEntry.tagEntry(tagKey);
+                    blockTagKeys.add(tagEntry);
+                } catch (IllegalArgumentException e) {
+                }
+                continue;
+            }
+            try {
+                Key key = Key.key(blockTag);
+                TypedKey<BlockType> typedKey = TypedKey.create(RegistryKey.BLOCK, key);
+                TagEntry<BlockType> tagEntry = TagEntry.valueEntry(typedKey);
+                blockTagKeys.add(tagEntry);
+            } catch (IllegalArgumentException | NullPointerException e) {
+            }
+        }
+        return blockTagKeys;
     }
 
     public static ConfigurationSection getConfigSection(ConfigurationSection section, String key) {

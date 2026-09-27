@@ -6,14 +6,20 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.event.RegistryEvents;
+import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
+import io.papermc.paper.registry.tag.TagKey;
+import io.papermc.paper.tag.TagEntry;
 import me.youhavetrouble.enchantio.enchants.EnchantioEnchant;
+import net.kyori.adventure.key.Key;
+import org.bukkit.block.BlockType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -39,6 +45,18 @@ public class EnchantioBootstrap implements PluginBootstrap {
                         ItemTypeTagKeys.create(enchant.getTagForSupportedItems().key()),
                         enchant.getSupportedItems()
                 );
+            }
+        }));
+
+        context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.BLOCK).newHandler((event) -> {
+            for (EnchantioEnchant enchant : enchantioEnchants) {
+                for (Map.Entry<Key, Set<TagEntry<BlockType>>> entry : enchant.getBlockTagsToRegister().entrySet()) {
+                    logger.info("Registering block tag {}", entry.getKey());
+                    event.registrar().addToTag(
+                            BlockTypeTagKeys.create(entry.getKey()),
+                            entry.getValue()
+                    );
+                }
             }
         }));
 
