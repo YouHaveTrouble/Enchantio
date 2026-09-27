@@ -74,10 +74,8 @@ public class TunnellingListener implements Listener {
         Set<Block> blocksToBreak = getSquare(block, blockFace, tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
         blockBreakSkips.addAll(blocksToBreak);
         for (Block b : blocksToBreak) {
-            BlockBreakEvent breakEvent = new BlockBreakEvent(b, player);
-            Enchantio.getPlugin(Enchantio.class).getServer().getPluginManager().callEvent(breakEvent);
+            event.getPlayer().breakBlock(b);
             blockBreakSkips.remove(b);
-            breakBlock(breakEvent, tunnellingEnchant);
         }
 
     }
@@ -124,17 +122,6 @@ public class TunnellingListener implements Listener {
             }
         }
         return blocks;
-    }
-
-    private void breakBlock(BlockBreakEvent event, TunnellingEnchant enchant) {
-        if (tunnelling == null) return;
-        if (event.isCancelled()) return;
-        Block block = event.getBlock();
-        ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-        int enchantLevel = item.getEnchantmentLevel(tunnelling);
-        if (enchantLevel <= 0) return;
-        block.breakNaturally(item, true, event.getExpToDrop() > 0, enchant.canBreakToolIncompatibleBlocks());
-        item.damage(1, event.getPlayer());
     }
 
 }
