@@ -152,6 +152,10 @@ public class TunnellingEnchant implements EnchantioEnchant {
                                         "#minecraft:base_stone_overworld",
                                         "#minecraft:base_stone_nether",
                                         "#minecraft:ores",
+                                        "#minecraft:terracotta",
+                                        "#minecraft:glazed_terracotta",
+                                        "#minecraft:concrete",
+                                        "#minecraft:stone_bricks",
                                         "minecraft:end_stone"
                                 )
                         ))
