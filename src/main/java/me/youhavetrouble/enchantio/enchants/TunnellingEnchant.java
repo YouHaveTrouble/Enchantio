@@ -149,7 +149,9 @@ public class TunnellingEnchant implements EnchantioEnchant {
                                         "#minecraft:glazed_terracotta",
                                         "#minecraft:concrete",
                                         "#minecraft:stone_bricks",
-                                        "minecraft:end_stone"
+                                        "minecraft:end_stone",
+                                        "minecraft:cobblestone",
+                                        "minecraft:cobbled_deepslate"
                                 )
                         ))
                 ),
