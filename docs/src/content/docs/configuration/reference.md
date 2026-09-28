@@ -18,8 +18,8 @@ Cost that will be added to the item when adding the enchantment to it in anvil.
 
 - **Type**: `int`
 
-Weight of the enchantment. Used if `canGetFromEnchantingTable` is set to true. Higher numbers mean it will come up more
-frequently in the enchanting table.
+Weight of the enchantment. Higher numbers mean it will come up more frequently in the enchanting table. Used if
+`#minecraft:in_enchanting_table` is present in enchantment tags.
 
 ### minimumCost
 
@@ -29,7 +29,7 @@ Minimum cost that will be required for the enchantment to show up in the enchant
 
 - **Type**: `int`
 
-Base cost of the enchant.
+Base cost of the enchantment.
 
 #### perLevel
 
@@ -45,7 +45,7 @@ Maximum cost that will be required for the enchantment to show up in the enchant
 
 - **Type**: `int`
 
-Base cost of the enchant.
+Base cost of the enchantment.
 
 #### perLevel
 
@@ -55,23 +55,22 @@ Cost to add per level of the enchantment.
 
 ### enchantmentTags
 
-- **Type**: `key[]`
+- **Type**: [`Enchantment Tags`](/configuration/input-types/#enchantment-tag)
 
-This is list of [tags](/configuration/input-types#tags) that the enchantment will be tagged with. This can be used to put the enchantment in enchanting table,
-mark it as a curse, etc. <a href="https://minecraft.wiki/w/Enchantment_tag_(Java_Edition)" target="_blank">All vanilla</a>
-and custom tags are supported.
+This is list of tags that the enchantment will be tagged with. This can be used to put the enchantment in enchanting table,
+mark it as a curse, etc.
 
 ### supportedItemTags
 
-- **Type**: `key[]`
+- **Type**: [`Item Tags`](/configuration/input-types/#items)
 
-[Items and/or item tags](/configuration/input-types#tags) that the enchantment can be applied to.
+Items and/or item tags that the enchantment can be applied to.
 
 ### activeSlots
 
-- **Type**: `string[]`
+- **Type**: [`Slot types`](/configuration/input-types/#slot-types)
 
-[Slots](/configuration/input-types#slot-types) that the enchantment will be active in.
+Inventory slots that the enchantment will be active in.
 
 
 ### enabled
@@ -96,9 +95,11 @@ of the enchantment does not support multiple levels.
 
 ## Telepathy
 
+### onlyUserCanPickupItems
+
 - **Type**: `boolean`
 
-If set to true, items teleported by the enchant will only be able to be picked up by the player that broke the block.
+If set to true, items teleported by the enchantment will only be able to be picked up by the player that broke the block.
 
 ## Executioner
 
