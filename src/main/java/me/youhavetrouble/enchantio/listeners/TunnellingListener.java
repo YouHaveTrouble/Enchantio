@@ -3,7 +3,6 @@ package me.youhavetrouble.enchantio.listeners;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
-import me.youhavetrouble.enchantio.Enchantio;
 import me.youhavetrouble.enchantio.EnchantioConfig;
 import me.youhavetrouble.enchantio.enchants.EnchantioEnchant;
 import me.youhavetrouble.enchantio.enchants.TunnellingEnchant;
@@ -22,9 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -41,7 +38,7 @@ public class TunnellingListener implements Listener {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         Player player = event.getPlayer();
-        if (player.isSneaking() || GameMode.CREATIVE.equals(player.getGameMode())) return;
+        if (GameMode.CREATIVE.equals(player.getGameMode())) return;
         ItemStack item = event.getItem();
         if (item == null) return;
         if (!item.containsEnchantment(tunnelling)) return;
@@ -74,31 +71,29 @@ public class TunnellingListener implements Listener {
         Set<Block> blocksToBreak = getSquare(block, blockFace, tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
         blockBreakSkips.addAll(blocksToBreak);
         for (Block b : blocksToBreak) {
+            if (player.getInventory().getItemInMainHand().isEmpty()) {
+                event.setCancelled(true);
+                blockBreakSkips.removeAll(blocksToBreak);
+                break;
+            }
             event.getPlayer().breakBlock(b);
             blockBreakSkips.remove(b);
         }
-
     }
 
     private Set<Block> getSquare(Block block, BlockFace face, int range) {
-        Set<Block> blocks = new  HashSet<>();
         switch (face) {
-            case DOWN:
-            case UP:
-                blocks.addAll(getBlocksToTunnel(block.getLocation(), range, 0, range));
-                break;
-            case EAST:
-            case WEST:
-                blocks.addAll(getBlocksToTunnel(block.getLocation(), 0, range, range));
-                break;
-            case NORTH:
-            case SOUTH:
-                blocks.addAll(getBlocksToTunnel(block.getLocation(), range, range, 0));
-                break;
-            default:
-                break;
+            case DOWN, UP -> {
+                return getBlocksToTunnel(block.getLocation(), range, 0, range);
+            }
+            case EAST, WEST -> {
+                return getBlocksToTunnel(block.getLocation(), 0, range, range);
+            }
+            case NORTH, SOUTH -> {
+                return getBlocksToTunnel(block.getLocation(), range, range, 0);
+            }
         }
-        return blocks;
+        return new HashSet<>();
     }
 
     /**
@@ -106,8 +101,8 @@ public class TunnellingListener implements Listener {
      * @param base location at the centre of selection
      * @return All blocks that will get broken
      */
-    private List<Block> getBlocksToTunnel(Location base, int changeX, int changeY, int changeZ) {
-        List<Block> blocks = new ArrayList<>();
+    private Set<Block> getBlocksToTunnel(Location base, int changeX, int changeY, int changeZ) {
+        Set<Block> blocks = new HashSet<>();
         for (int x = (base.getBlockX() - changeX); x <= (base.getBlockX() + changeX); x++) {
             for (int y = (base.getBlockY() - changeY); y <= (base.getBlockY() + changeY); y++) {
                 for (int z = (base.getBlockZ() - changeZ); z <= (base.getBlockZ() + changeZ); z++) {
