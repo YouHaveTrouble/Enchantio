@@ -3,8 +3,8 @@ package me.youhavetrouble.enchantio.listeners;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
+import me.youhavetrouble.enchantio.Enchantio;
 import me.youhavetrouble.enchantio.EnchantioConfig;
-import me.youhavetrouble.enchantio.enchants.EnchantioEnchant;
 import me.youhavetrouble.enchantio.enchants.TunnellingEnchant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -16,41 +16,100 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunnellingListener implements Listener {
 
     private final static Set<Block> blockBreakSkips = new HashSet<>();
+    private final static Map<UUID, BlockBreakData> blockBreakData = new ConcurrentHashMap<>();
     private final Enchantment tunnelling = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(TunnellingEnchant.KEY);
     private final NamespacedKey tunnellingBlockFaceKey = new NamespacedKey("enchantio", "tunellingblockface");
+    private final TunnellingEnchant tunnellingEnchant;
 
+
+    public TunnellingListener() {
+        if (EnchantioConfig.ENCHANTS.get(TunnellingEnchant.KEY) instanceof TunnellingEnchant enchant) {
+            this.tunnellingEnchant = enchant;
+        } else {
+            throw new RuntimeException("Tunnelling enchantment is not registered, but something tried to create a listener for it. Don't do that.");
+        }
+    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onTunnelBlockSideCheck(BlockDamageEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
+        event.getPlayer().getScheduler().runAtFixedRate(Enchantio.getPlugin(Enchantio.class), (task) -> {
+            if (!blockBreakData.containsKey(uuid)) return;
+            Player player = Bukkit.getPlayer(uuid);
+            BlockBreakData data = blockBreakData.get(uuid);
+            if (player == null || !player.isOnline()) return;
+            long elapsedTicks = player.getWorld().getFullTime() - data.startedBreakingAtTick();
+            float breakSpeed = data.block.getBreakSpeed(player);
+            float ticksNeeded = 1.0f / breakSpeed;
+            float progress = Math.min(elapsedTicks / ticksNeeded, 1.0f);
+            if (progress >= 1.0f) return;
+            updateBlockBreakProgress(player, data, progress);
+        }, null, 1, 1);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTunnelBlockStartBreak(BlockDamageEvent event) {
         if (tunnelling == null) return;
         Player player = event.getPlayer();
         if (GameMode.CREATIVE.equals(player.getGameMode())) return;
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item.isEmpty()) return;
-        if (!item.containsEnchantment(tunnelling)) return;
+        int enchantLevel = item.getEnchantmentLevel(tunnelling);
+        if (enchantLevel == -1) return;
         player.getPersistentDataContainer().set(tunnellingBlockFaceKey, PersistentDataType.STRING, event.getBlockFace().toString());
+        if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
+        if (blockBreakData.containsKey(player.getUniqueId())) return;
+        Block block = event.getBlock();
+        Set<Block> blocksToBreak = getSquare(block, event.getBlockFace(), tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
+        blockBreakData.put(player.getUniqueId(), new BlockBreakData(block, block.getWorld().getFullTime(), blocksToBreak));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTunnelBlockStopBreak(BlockDamageAbortEvent event) {
+        BlockBreakData data = blockBreakData.remove(event.getPlayer().getUniqueId());
+        if (data == null) return;
+        updateBlockBreakProgress(event.getPlayer(), data, 0f);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        blockBreakData.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTpToAnotherWorld(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+        BlockBreakData data = blockBreakData.get(player.getUniqueId());
+        if (data == null) return;
+        if (data.block.getWorld().getUID().equals(player.getWorld().getUID())) return;
+        blockBreakData.remove(player.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onTunnelBlockBreak(BlockBreakEvent event) {
         if (tunnelling == null) return;
         Player player = event.getPlayer();
+        BlockBreakData data = blockBreakData.remove(player.getUniqueId());
+        if (data != null) updateBlockBreakProgress(player, data, 0f);
         if (GameMode.CREATIVE.equals(player.getGameMode())) return;
         if (player.isSneaking()) return;
         String rawFace = player.getPersistentDataContainer().get(tunnellingBlockFaceKey, PersistentDataType.STRING);
         if (rawFace == null) return;
-        EnchantioEnchant enchant = EnchantioConfig.ENCHANTS.get(TunnellingEnchant.KEY);
-        if (!(enchant instanceof TunnellingEnchant tunnellingEnchant)) return;
         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
         int enchantLevel = item.getEnchantmentLevel(tunnelling);
         if (enchantLevel <= 0) return;
@@ -74,6 +133,14 @@ public class TunnellingListener implements Listener {
             }
             event.getPlayer().breakBlock(b);
             blockBreakSkips.remove(b);
+        }
+    }
+
+    private void updateBlockBreakProgress(Player player, BlockBreakData data, float progress) {
+        if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
+        int id = Integer.MIN_VALUE;
+        for (Block block : data.blocksToSyncDamage) {
+            player.sendBlockDamage(block.getLocation(), progress, id++);
         }
     }
 
@@ -114,5 +181,7 @@ public class TunnellingListener implements Listener {
         }
         return blocks;
     }
+
+    private record BlockBreakData(Block block, long startedBreakingAtTick, Set<Block> blocksToSyncDamage) {}
 
 }

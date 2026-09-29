@@ -25,6 +25,7 @@ public class TunnellingEnchant implements EnchantioEnchant {
     public static final Key AFFECTED_BLOCKS_KEY = Key.key("enchantio", "affected_by_tunnelling");
 
     private final int anvilCost, weight, maxLevel, blocksPerLevel;
+    private final boolean visualizeBreaking;
     private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
     private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
     private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
@@ -40,7 +41,8 @@ public class TunnellingEnchant implements EnchantioEnchant {
             Collection<TagEntry<ItemType>> supportedItemTags,
             Map<Key, Set<TagEntry<BlockType>>> affectedBlockTags,
             int maxLevel,
-            int blocksPerLevel
+            int blocksPerLevel,
+            boolean visualizeBreaking
     ) {
         this.anvilCost = anvilCost;
         this.weight = weight;
@@ -48,6 +50,7 @@ public class TunnellingEnchant implements EnchantioEnchant {
         this.maximumCost = maximumCost;
         this.maxLevel = maxLevel;
         this.blocksPerLevel = blocksPerLevel;
+        this.visualizeBreaking = visualizeBreaking;
         this.supportedItemTags.addAll(supportedItemTags);
         this.enchantTagKeys.addAll(enchantTagKeys);
         this.affectedBlockTags.putAll(affectedBlockTags);
@@ -112,6 +115,10 @@ public class TunnellingEnchant implements EnchantioEnchant {
         return blocksPerLevel;
     }
 
+    public boolean shouldVisualizeBreaking() {
+        return visualizeBreaking;
+    }
+
     public static TunnellingEnchant create(ConfigurationSection configurationSection) {
         TunnellingEnchant tunnellingEnchant = new TunnellingEnchant(
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 1),
@@ -156,7 +163,8 @@ public class TunnellingEnchant implements EnchantioEnchant {
                         ))
                 ),
                 EnchantioConfig.getInt(configurationSection, "maxLevel", 1),
-                EnchantioConfig.getInt(configurationSection, "blocksPerLevel", 1)
+                EnchantioConfig.getInt(configurationSection, "blocksPerLevel", 1),
+                EnchantioConfig.getBoolean(configurationSection, "visualizeBreaking", true)
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
