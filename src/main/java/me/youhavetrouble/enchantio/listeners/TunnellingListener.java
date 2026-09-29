@@ -46,10 +46,13 @@ public class TunnellingListener implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
         if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
         event.getPlayer().getScheduler().runAtFixedRate(Enchantio.getPlugin(Enchantio.class), (task) -> {
-            if (!blockBreakData.containsKey(uuid)) return;
             Player player = Bukkit.getPlayer(uuid);
+            if (player == null || !player.isOnline()) {
+                task.cancel();
+                return;
+            }
             BlockBreakData data = blockBreakData.get(uuid);
-            if (player == null || !player.isOnline()) return;
+            if (data == null) return;
             long elapsedTicks = player.getWorld().getFullTime() - data.startedBreakingAtTick();
             float breakSpeed = data.block.getBreakSpeed(player);
             float ticksNeeded = 1.0f / breakSpeed;
