@@ -71,7 +71,6 @@ public class TunnellingListener implements Listener {
         if (item.isEmpty()) return;
         int enchantLevel = item.getEnchantmentLevel(tunnelling);
         if (enchantLevel == -1) return;
-        if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
         if (blockBreakData.containsKey(player.getUniqueId())) return;
         Block block = event.getBlock();
         Set<Block> blocksToBreak = getSquare(block, event.getBlockFace(), tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
