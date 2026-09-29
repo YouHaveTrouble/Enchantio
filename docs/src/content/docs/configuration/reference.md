@@ -156,6 +156,20 @@ Cooldown in ticks that will be applied to the activating items cooldown group.
 
 Namespaced key of the sound that will play when enchantment blocks a hit.
 
+## Tunnelling
+
+### blocksPerLevel
+
+- **Type**: `int`
+
+How many blocks in each direction enchantment should mine per enchantment level.
+
+### visualizeBreaking
+
+- **Type**: `boolean`
+
+Display visualisation of blocks being broken by the enchantment along with breaking the base block.
+
 ## Panic
 
 ### panicChancePerLevel

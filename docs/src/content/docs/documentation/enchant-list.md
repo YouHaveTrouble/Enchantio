@@ -73,6 +73,13 @@ Automatically blocks hits, but triggers a configurable cooldown every time it do
 the enchanted items cooldown group, so if you make this enchantment support more than just 1 item, you're going to have
 to handle applying the cooldown group to them yourself.
 
+### Tunnelling
+**Translation key**: `enchantio.enchantment.tunnelling`
+
+**Description**:
+Mines multiple blocks around initially destroyed block.
+
+
 ## Curses
 
 ### Curse of Panic
