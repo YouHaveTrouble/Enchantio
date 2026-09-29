@@ -22,7 +22,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,9 +31,7 @@ public class TunnellingListener implements Listener {
     private final static Set<Block> blockBreakSkips = new HashSet<>();
     private final static Map<UUID, BlockBreakData> blockBreakData = new ConcurrentHashMap<>();
     private final Enchantment tunnelling = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(TunnellingEnchant.KEY);
-    private final NamespacedKey tunnellingBlockFaceKey = new NamespacedKey("enchantio", "tunellingblockface");
     private final TunnellingEnchant tunnellingEnchant;
-
 
     public TunnellingListener() {
         if (EnchantioConfig.ENCHANTS.get(TunnellingEnchant.KEY) instanceof TunnellingEnchant enchant) {
@@ -71,12 +68,11 @@ public class TunnellingListener implements Listener {
         if (item.isEmpty()) return;
         int enchantLevel = item.getEnchantmentLevel(tunnelling);
         if (enchantLevel == -1) return;
-        player.getPersistentDataContainer().set(tunnellingBlockFaceKey, PersistentDataType.STRING, event.getBlockFace().toString());
         if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
         if (blockBreakData.containsKey(player.getUniqueId())) return;
         Block block = event.getBlock();
         Set<Block> blocksToBreak = getSquare(block, event.getBlockFace(), tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
-        blockBreakData.put(player.getUniqueId(), new BlockBreakData(block, block.getWorld().getFullTime(), blocksToBreak));
+        blockBreakData.put(player.getUniqueId(), new BlockBreakData(block, block.getWorld().getFullTime(), event.getBlockFace(), blocksToBreak));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -104,26 +100,19 @@ public class TunnellingListener implements Listener {
     public void onTunnelBlockBreak(BlockBreakEvent event) {
         if (tunnelling == null) return;
         Player player = event.getPlayer();
+        Block block = event.getBlock();
         BlockBreakData data = blockBreakData.remove(player.getUniqueId());
+        if (blockBreakSkips.contains(block)) return;
         if (data != null) updateBlockBreakProgress(player, data, 0f);
         if (GameMode.CREATIVE.equals(player.getGameMode())) return;
         if (player.isSneaking()) return;
-        String rawFace = player.getPersistentDataContainer().get(tunnellingBlockFaceKey, PersistentDataType.STRING);
-        if (rawFace == null) return;
         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
         int enchantLevel = item.getEnchantmentLevel(tunnelling);
         if (enchantLevel <= 0) return;
-        Block block = event.getBlock();
         BlockType blockType = block.getType().asBlockType();
         if (!Registry.BLOCK.getTagValues(BlockTypeTagKeys.create(TunnellingEnchant.AFFECTED_BLOCKS_KEY)).contains(blockType)) return;
-        if (blockBreakSkips.contains(block)) return;
-        BlockFace blockFace;
-        try {
-            blockFace = BlockFace.valueOf(rawFace);
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-        Set<Block> blocksToBreak = getSquare(block, blockFace, tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
+        if (data == null) return;
+        Set<Block> blocksToBreak = getSquare(block, data.blockFace, tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
         blockBreakSkips.addAll(blocksToBreak);
         for (Block b : blocksToBreak) {
             if (player.getInventory().getItemInMainHand().isEmpty()) {
@@ -182,6 +171,6 @@ public class TunnellingListener implements Listener {
         return blocks;
     }
 
-    private record BlockBreakData(Block block, long startedBreakingAtTick, Set<Block> blocksToSyncDamage) {}
+    private record BlockBreakData(Block block, long startedBreakingAtTick, BlockFace blockFace, Set<Block> blocksToSyncDamage) {}
 
 }
