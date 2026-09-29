@@ -77,7 +77,8 @@ to handle applying the cooldown group to them yourself.
 **Translation key**: `enchantio.enchantment.tunnelling`
 
 **Description**:
-Mines multiple blocks around initially destroyed block.
+Mines multiple blocks around initially destroyed block. Activates when mining affected block and breaks all the affected
+blocks in a `range x range x 1` pattern.
 
 
 ## Curses

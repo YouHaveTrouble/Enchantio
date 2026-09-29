@@ -158,6 +158,12 @@ Namespaced key of the sound that will play when enchantment blocks a hit.
 
 ## Tunnelling
 
+### affectedBlockTags
+
+- **Type**: [`Block Tags`](/configuration/input-types/#blocks)
+
+List of blocks and block tags that will be affected by the enchantment's mining effect.
+
 ### blocksPerLevel
 
 - **Type**: `int`
