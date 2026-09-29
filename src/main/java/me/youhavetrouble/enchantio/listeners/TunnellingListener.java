@@ -15,10 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import java.util.HashSet;
@@ -33,16 +31,14 @@ public class TunnellingListener implements Listener {
 
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onTunnelBlockSideCheck(PlayerInteractEvent event) {
+    public void onTunnelBlockSideCheck(BlockDamageEvent event) {
         if (tunnelling == null) return;
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         Player player = event.getPlayer();
         if (GameMode.CREATIVE.equals(player.getGameMode())) return;
-        ItemStack item = event.getItem();
-        if (item == null) return;
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item.isEmpty()) return;
         if (!item.containsEnchantment(tunnelling)) return;
-        event.getPlayer().getPersistentDataContainer().set(tunnellingBlockFaceKey, PersistentDataType.STRING, event.getBlockFace().toString());
+        player.getPersistentDataContainer().set(tunnellingBlockFaceKey, PersistentDataType.STRING, event.getBlockFace().toString());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
