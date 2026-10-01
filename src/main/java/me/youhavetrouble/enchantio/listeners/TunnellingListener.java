@@ -53,6 +53,10 @@ public class TunnellingListener implements Listener {
             }
             BlockBreakData data = blockBreakData.get(uuid);
             if (data == null) return;
+            if (player.isSneaking()) {
+                updateBlockBreakProgress(player, data, 0);
+                return;
+            }
             long elapsed = System.currentTimeMillis() - data.startedBreakingAt();
             long elapsedTicks = elapsed / 50;
             float breakSpeed = data.block.getBreakSpeed(player);
