@@ -53,7 +53,8 @@ public class TunnellingListener implements Listener {
             }
             BlockBreakData data = blockBreakData.get(uuid);
             if (data == null) return;
-            long elapsedTicks = player.getWorld().getFullTime() - data.startedBreakingAtTick();
+            long elapsed = System.currentTimeMillis() - data.startedBreakingAt();
+            long elapsedTicks = elapsed / 50;
             float breakSpeed = data.block.getBreakSpeed(player);
             float ticksNeeded = 1.0f / breakSpeed;
             float progress = Math.min(elapsedTicks / ticksNeeded, 1.0f);
@@ -74,7 +75,7 @@ public class TunnellingListener implements Listener {
         if (blockBreakData.containsKey(player.getUniqueId())) return;
         Block block = event.getBlock();
         Set<Block> blocksToBreak = getSquare(block, event.getBlockFace(), tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
-        blockBreakData.put(player.getUniqueId(), new BlockBreakData(block, block.getWorld().getFullTime(), event.getBlockFace(), blocksToBreak));
+        blockBreakData.put(player.getUniqueId(), new BlockBreakData(block, System.currentTimeMillis(), event.getBlockFace(), blocksToBreak));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -173,6 +174,6 @@ public class TunnellingListener implements Listener {
         return blocks;
     }
 
-    private record BlockBreakData(Block block, long startedBreakingAtTick, BlockFace blockFace, Set<Block> blocksToSyncDamage) {}
+    private record BlockBreakData(Block block, long startedBreakingAt, BlockFace blockFace, Set<Block> blocksToSyncDamage) {}
 
 }
