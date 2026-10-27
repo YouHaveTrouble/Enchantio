@@ -25,13 +25,14 @@ public class VampirismListener implements Listener {
                 boolean hasVampirism = Enchantio.getSumOfEnchantLevels(player.getEquipment(), vampirism) != 0;
                 if (!hasVampirism) continue;
                 player.getScheduler().execute(enchantio, () -> {
+                    if (!player.getWorld().isDayTime()) return;
                     Location abovePlayer = player.getLocation().add(0, player.getEyeHeight() + 0.5, 0);
                     Block block = player.getWorld().getBlockAt(abovePlayer);
                     byte light = block.getLightFromSky();
                     if (light < 15) return;
                     int fireTicks = player.getFireTicks();
 
-                    // Prefent fire animation from disappearing on the client
+                    // Prevent fire animation from disappearing on the client
                     if (player.getFireTicks() < 20) {
                         fireTicks = 25;
                     }
