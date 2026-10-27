@@ -124,7 +124,7 @@ public class VampirismEnchant implements EnchantioEnchant {
                         configurationSection,
                         "activeSlots",
                         List.of(
-                                "ANY"
+                                "ARMOR"
                         )
                 ))
         );
