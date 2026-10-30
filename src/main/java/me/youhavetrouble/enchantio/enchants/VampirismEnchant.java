@@ -26,6 +26,7 @@ public class VampirismEnchant implements EnchantioEnchant {
     private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
     private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
     private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
+    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
     private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
 
     public VampirismEnchant(
@@ -34,6 +35,7 @@ public class VampirismEnchant implements EnchantioEnchant {
             EnchantmentRegistryEntry.EnchantmentCost minimumCost,
             EnchantmentRegistryEntry.EnchantmentCost maximumCost,
             Collection<TagKey<Enchantment>> enchantTagKeys,
+            Collection<TagKey<Enchantment>> exclusiveTagKeys,
             Collection<TagEntry<ItemType>> supportedItemTags,
             Collection<EquipmentSlotGroup> activeSlots
     ) {
@@ -44,6 +46,7 @@ public class VampirismEnchant implements EnchantioEnchant {
         this.supportedItemTags.addAll(supportedItemTags);
         this.activeSlots.addAll(activeSlots);
         this.enchantTagKeys.addAll(enchantTagKeys);
+        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
     }
 
     @Override
@@ -96,6 +99,11 @@ public class VampirismEnchant implements EnchantioEnchant {
         return Collections.unmodifiableSet(enchantTagKeys);
     }
 
+    @Override
+    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
+        return Collections.unmodifiableSet(exclusiveTagKeys);
+    }
+
     public static VampirismEnchant create(ConfigurationSection configurationSection) {
         VampirismEnchant vampirismEnchant = new VampirismEnchant(
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 1),
@@ -112,6 +120,11 @@ public class VampirismEnchant implements EnchantioEnchant {
                         configurationSection,
                         "enchantmentTags",
                         List.of("#in_enchanting_table", "#curse")
+                )),
+                EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
+                        configurationSection,
+                        "exclusiveTags",
+                        List.of()
                 )),
                 EnchantioConfig.getItemTagEntriesFromList(EnchantioConfig.getStringList(
                         configurationSection,

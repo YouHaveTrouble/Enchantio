@@ -26,6 +26,7 @@ public class ReplantingEnchant implements EnchantioEnchant {
     private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
     private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
     private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
+    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
 
     public ReplantingEnchant(
             int anvilCost,
@@ -33,6 +34,7 @@ public class ReplantingEnchant implements EnchantioEnchant {
             EnchantmentRegistryEntry.EnchantmentCost minimumCost,
             EnchantmentRegistryEntry.EnchantmentCost maximumCost,
             Collection<TagKey<Enchantment>> enchantTagKeys,
+            Collection<TagKey<Enchantment>> exclusiveTagKeys,
             Collection<TagEntry<ItemType>> supportedItemTags
     ) {
         this.anvilCost = anvilCost;
@@ -41,6 +43,7 @@ public class ReplantingEnchant implements EnchantioEnchant {
         this.maximumCost = maximumCost;
         this.supportedItemTags.addAll(supportedItemTags);
         this.enchantTagKeys.addAll(enchantTagKeys);
+        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
     }
 
     @Override
@@ -93,6 +96,11 @@ public class ReplantingEnchant implements EnchantioEnchant {
         return Collections.unmodifiableSet(enchantTagKeys);
     }
 
+    @Override
+    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
+        return Collections.unmodifiableSet(exclusiveTagKeys);
+    }
+
     public static ReplantingEnchant create(ConfigurationSection configurationSection) {
         ReplantingEnchant replantingEnchant = new ReplantingEnchant(
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 1),
@@ -109,6 +117,11 @@ public class ReplantingEnchant implements EnchantioEnchant {
                         configurationSection,
                         "enchantmentTags",
                         List.of("#in_enchanting_table")
+                )),
+                EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
+                        configurationSection,
+                        "exclusiveTags",
+                        List.of()
                 )),
                 EnchantioConfig.getItemTagEntriesFromList(EnchantioConfig.getStringList(
                         configurationSection,

@@ -26,6 +26,7 @@ public class VolleyEnchant implements EnchantioEnchant {
     private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
     private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
     private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
+    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
     private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
     private final double spread;
 
@@ -35,6 +36,7 @@ public class VolleyEnchant implements EnchantioEnchant {
             EnchantmentRegistryEntry.EnchantmentCost minimumCost,
             EnchantmentRegistryEntry.EnchantmentCost maximumCost,
             Collection<TagKey<Enchantment>> enchantTagKeys,
+            Collection<TagKey<Enchantment>> exclusiveTagKeys,
             Collection<TagEntry<ItemType>> supportedItemTags,
             Collection<EquipmentSlotGroup> activeSlots,
             int maxLevel,
@@ -51,6 +53,7 @@ public class VolleyEnchant implements EnchantioEnchant {
         this.additionalArrowsPerLevel = additionalArrowsPerLevel;
         this.spread = spread;
         this.enchantTagKeys.addAll(enchantTagKeys);
+        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
     }
 
     @Override
@@ -111,6 +114,11 @@ public class VolleyEnchant implements EnchantioEnchant {
         return Collections.unmodifiableSet(enchantTagKeys);
     }
 
+    @Override
+    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
+        return Collections.unmodifiableSet(exclusiveTagKeys);
+    }
+
     public static VolleyEnchant create(ConfigurationSection configurationSection) {
         VolleyEnchant executionerEnchant = new VolleyEnchant(
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 1),
@@ -126,7 +134,12 @@ public class VolleyEnchant implements EnchantioEnchant {
                 EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
                         configurationSection,
                         "enchantmentTags",
-                        List.of("#in_enchanting_table")
+                        List.of("#in_enchanting_table", "#minecraft:exclusive_set/bow")
+                )),
+                EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
+                        configurationSection,
+                        "exclusiveTags",
+                        List.of("#minecraft:exclusive_set/bow")
                 )),
                 EnchantioConfig.getItemTagEntriesFromList(EnchantioConfig.getStringList(
                         configurationSection,

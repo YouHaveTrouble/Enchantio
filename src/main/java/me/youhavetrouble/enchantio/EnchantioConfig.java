@@ -27,6 +27,7 @@ import java.util.*;
 public class EnchantioConfig {
 
     public static final Map<Key, EnchantioEnchant> ENCHANTS = new HashMap<>();
+    public static boolean DEBUG = false;
     private static boolean initialized = false;
 
     protected static void init(Path filePath) throws IOException {
@@ -43,6 +44,8 @@ public class EnchantioConfig {
         configFile.createNewFile();
 
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(configFile);
+
+        DEBUG = getBoolean(configuration, "debug", false);
 
         ConfigurationSection enchantsSection = getConfigSection(configuration, "enchants");
         migrateEnchantTags(enchantsSection);

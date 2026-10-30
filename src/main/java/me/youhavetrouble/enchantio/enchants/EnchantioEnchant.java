@@ -52,8 +52,15 @@ public interface EnchantioEnchant {
     Set<TagKey<Enchantment>> getEnchantTagKeys();
 
     @NotNull
+    Set<TagKey<Enchantment>> getExclusiveTagKeys();
+
+    @NotNull
     default TagKey<ItemType> getTagForSupportedItems() {
         return TagKey.create(RegistryKey.ITEM, Key.key( getKey().asString() + "_enchantable"));
+    }
+
+    default TagKey<Enchantment> getTagForExclusiveEnchants() {
+        return TagKey.create(RegistryKey.ENCHANTMENT, Key.key( getKey().asString() + "_exclusive"));
     }
 
     @NotNull

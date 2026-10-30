@@ -27,6 +27,7 @@ public class ExecutionerEnchant implements EnchantioEnchant {
     private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
     private final double damageMultiplierPerLevel, maxDamageHpThreshold;
     private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
+    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
     private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
 
 
@@ -36,6 +37,7 @@ public class ExecutionerEnchant implements EnchantioEnchant {
             EnchantmentRegistryEntry.EnchantmentCost minimumCost,
             EnchantmentRegistryEntry.EnchantmentCost maximumCost,
             Collection<TagKey<Enchantment>> enchantTagKeys,
+            Collection<TagKey<Enchantment>> exclusiveTagKeys,
             Collection<TagEntry<ItemType>> supportedItemTags,
             Collection<EquipmentSlotGroup> activeSlots,
             int maxLevel,
@@ -52,6 +54,7 @@ public class ExecutionerEnchant implements EnchantioEnchant {
         this.damageMultiplierPerLevel = damageMultiplierPerLevel;
         this.maxDamageHpThreshold = maxDamageHpThreshold;
         this.enchantTagKeys.addAll(enchantTagKeys);
+        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
     }
 
     @Override
@@ -112,6 +115,11 @@ public class ExecutionerEnchant implements EnchantioEnchant {
         return Collections.unmodifiableSet(enchantTagKeys);
     }
 
+    @Override
+    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
+        return Collections.unmodifiableSet(exclusiveTagKeys);
+    }
+
     public static ExecutionerEnchant create(ConfigurationSection configurationSection) {
         ExecutionerEnchant executionerEnchant = new ExecutionerEnchant(
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 1),
@@ -127,7 +135,12 @@ public class ExecutionerEnchant implements EnchantioEnchant {
                 EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
                         configurationSection,
                         "enchantmentTags",
-                        List.of("#in_enchanting_table")
+                        List.of("#in_enchanting_table", "#minecraft:exclusive_set/damage")
+                )),
+                EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
+                        configurationSection,
+                        "exclusiveTags",
+                        List.of("#minecraft:exclusive_set/damage")
                 )),
                 EnchantioConfig.getItemTagEntriesFromList(EnchantioConfig.getStringList(
                         configurationSection,
