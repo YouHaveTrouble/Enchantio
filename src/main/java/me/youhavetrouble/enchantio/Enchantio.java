@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class Enchantio extends JavaPlugin {
 
     @Override
