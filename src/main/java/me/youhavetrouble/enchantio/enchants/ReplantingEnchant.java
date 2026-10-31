@@ -32,7 +32,7 @@ public class ReplantingEnchant extends EnchantioEnchant {
     ) {
         super(
                 KEY,
-                Component.translatable("enchantio.enchant.panic_curse", "Curse of Panic"),
+                Component.translatable("enchantio.enchant.replanting", "Replanting"),
                 anvilCost,
                 1,
                 weight,
