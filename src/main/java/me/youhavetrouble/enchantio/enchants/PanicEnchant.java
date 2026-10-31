@@ -10,25 +10,17 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
-import static me.youhavetrouble.enchantio.EnchantioConfig.ENCHANTS;
 
 @SuppressWarnings("UnstableApiUsage")
-public class PanicEnchant implements EnchantioEnchant {
+public class PanicEnchant extends EnchantioEnchant {
 
     public static final Key KEY = Key.key("enchantio:panic_curse");
 
-    private final int anvilCost, weight, maxLevel;
-    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
-    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
-    private final double panicChancePerLevel;
-    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
-    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
-    private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
+    public final double panicChancePerLevel;
 
     public PanicEnchant(
             int anvilCost,
@@ -42,71 +34,20 @@ public class PanicEnchant implements EnchantioEnchant {
             int maxLevel,
             double panicChancePerLevel
     ) {
-        this.anvilCost = anvilCost;
-        this.weight = weight;
-        this.maxLevel = maxLevel;
-        this.minimumCost = minimumCost;
-        this.maximumCost = maximumCost;
-        this.supportedItemTags.addAll(supportedItemTags);
+        super(
+                KEY,
+                Component.translatable("enchantio.enchant.panic_curse", "Curse of Panic"),
+                anvilCost,
+                maxLevel,
+                weight,
+                minimumCost,
+                maximumCost,
+                activeSlots,
+                supportedItemTags,
+                enchantTagKeys,
+                exclusiveTagKeys
+        );
         this.panicChancePerLevel = panicChancePerLevel;
-        this.activeSlots.addAll(activeSlots);
-        this.enchantTagKeys.addAll(enchantTagKeys);
-        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
-    }
-
-    @Override
-    public @NotNull Key getKey() {
-        return KEY;
-    }
-
-    @Override
-    public @NotNull Component getDescription() {
-        return Component.translatable("enchantio.enchant.panic_curse", "Curse of Panic");
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return anvilCost;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
-        return minimumCost;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
-        return maximumCost;
-    }
-
-    @Override
-    public @NotNull Iterable<EquipmentSlotGroup> getActiveSlots() {
-        return activeSlots;
-    }
-
-    @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return supportedItemTags;
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getEnchantTagKeys() {
-        return Collections.unmodifiableSet(enchantTagKeys);
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
-        return Collections.unmodifiableSet(exclusiveTagKeys);
     }
 
     public double getPanicChancePerLevel() {
@@ -154,7 +95,7 @@ public class PanicEnchant implements EnchantioEnchant {
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
-            ENCHANTS.put(PanicEnchant.KEY, panicEnchant);
+            EnchantioConfig.ENCHANTS.put(PanicEnchant.KEY, panicEnchant);
         }
 
         return panicEnchant;

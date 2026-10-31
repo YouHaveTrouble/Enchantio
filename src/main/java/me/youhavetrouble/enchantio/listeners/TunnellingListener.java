@@ -44,7 +44,7 @@ public class TunnellingListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
-        if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
+        if (!tunnellingEnchant.visualizeBreaking) return;
         event.getPlayer().getScheduler().runAtFixedRate(Enchantio.getPlugin(Enchantio.class), (task) -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null || !player.isOnline()) {
@@ -78,7 +78,7 @@ public class TunnellingListener implements Listener {
         if (enchantLevel == -1) return;
         if (blockBreakData.containsKey(player.getUniqueId())) return;
         Block block = event.getBlock();
-        Set<Block> blocksToBreak = getSquare(block, event.getBlockFace(), tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
+        Set<Block> blocksToBreak = getSquare(block, event.getBlockFace(), tunnellingEnchant.blocksPerLevel * enchantLevel);
         blockBreakData.put(player.getUniqueId(), new BlockBreakData(block, System.currentTimeMillis(), event.getBlockFace(), blocksToBreak));
     }
 
@@ -119,7 +119,7 @@ public class TunnellingListener implements Listener {
         BlockType blockType = block.getType().asBlockType();
         if (!Registry.BLOCK.getTagValues(BlockTypeTagKeys.create(TunnellingEnchant.AFFECTED_BLOCKS_KEY)).contains(blockType)) return;
         if (data == null) return;
-        Set<Block> blocksToBreak = getSquare(block, data.blockFace, tunnellingEnchant.getBlocksPerLevel() * enchantLevel);
+        Set<Block> blocksToBreak = getSquare(block, data.blockFace, tunnellingEnchant.blocksPerLevel * enchantLevel);
         blockBreakSkips.addAll(blocksToBreak);
         for (Block b : blocksToBreak) {
             if (player.getInventory().getItemInMainHand().isEmpty()) {
@@ -133,7 +133,7 @@ public class TunnellingListener implements Listener {
     }
 
     private void updateBlockBreakProgress(Player player, BlockBreakData data, float progress) {
-        if (!tunnellingEnchant.shouldVisualizeBreaking()) return;
+        if (!tunnellingEnchant.visualizeBreaking) return;
         int id = Integer.MIN_VALUE;
         for (Block block : data.blocksToSyncDamage) {
             player.sendBlockDamage(block.getLocation(), progress, id++);

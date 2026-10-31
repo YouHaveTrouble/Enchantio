@@ -1,6 +1,7 @@
 package me.youhavetrouble.enchantio.enchants;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
@@ -16,67 +17,79 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("UnstableApiUsage")
-public interface EnchantioEnchant {
+public abstract class EnchantioEnchant {
 
+    @NotNull public final Key key;
+    @NotNull public final Component description;
+    public final int anvilCost, maxLevel,  weight;
     @NotNull
-    Key getKey();
-
+    public final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
     @NotNull
-    Component getDescription();
-
-    int getAnvilCost();
-
-    int getMaxLevel();
-
-    int getWeight();
-
+    public final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
     @NotNull
-    EnchantmentRegistryEntry.EnchantmentCost getMinimumCost();
+    public final Set<EquipmentSlotGroup> activeSlots;
+    @NotNull public final Set<TagEntry<ItemType>> supportedItems;
+    @NotNull public final Set<TagKey<Enchantment>> enchantTagKeys;
+    @NotNull public final Set<TagKey<Enchantment>> exclusiveTagKeys;
 
-    @NotNull
-    EnchantmentRegistryEntry.EnchantmentCost getMaximumCost();
+    public EnchantioEnchant(
+            @NotNull Key key,
+            @NotNull Component description,
+            int anvilCost,
+            int maxLevel,
+            int weight,
+            EnchantmentRegistryEntry.@NonNull EnchantmentCost minimumCost,
+            EnchantmentRegistryEntry.@NonNull EnchantmentCost maximumCost,
+            @NotNull Collection<EquipmentSlotGroup> activeSlots,
+            @NotNull Collection<TagEntry<ItemType>> supportedItems,
+            @NotNull Collection<TagKey<Enchantment>> enchantTagKeys,
+            @NotNull Collection<TagKey<Enchantment>> exclusiveTagKeys
 
-    @NotNull
-    Iterable<EquipmentSlotGroup> getActiveSlots();
+    ) {
+        this.key = key;
+        this.description = description;
+        this.anvilCost = anvilCost;
+        this.maxLevel = maxLevel;
+        this.weight = weight;
+        this.minimumCost = minimumCost;
+        this.maximumCost = maximumCost;
+        this.activeSlots = ImmutableSet.copyOf(activeSlots);
+        this.supportedItems = ImmutableSet.copyOf(supportedItems);
+        this.enchantTagKeys = ImmutableSet.copyOf(enchantTagKeys);
+        this.exclusiveTagKeys = ImmutableSet.copyOf(exclusiveTagKeys);
 
-    @NotNull
-    Set<TagEntry<ItemType>> getSupportedItems();
-
-    @NotNull
-    Set<TagKey<Enchantment>> getEnchantTagKeys();
-
-    @NotNull
-    Set<TagKey<Enchantment>> getExclusiveTagKeys();
-
-    @NotNull
-    default TagKey<ItemType> getTagForSupportedItems() {
-        return TagKey.create(RegistryKey.ITEM, Key.key( getKey().asString() + "_enchantable"));
     }
 
-    default TagKey<Enchantment> getTagForExclusiveEnchants() {
-        return TagKey.create(RegistryKey.ENCHANTMENT, Key.key( getKey().asString() + "_exclusive"));
+    @NotNull
+    public TagKey<ItemType> getTagForSupportedItems() {
+        return TagKey.create(RegistryKey.ITEM, Key.key( key + "_enchantable"));
+    }
+
+    public TagKey<Enchantment> getTagForExclusiveEnchants() {
+        return TagKey.create(RegistryKey.ENCHANTMENT, Key.key( key + "_exclusive"));
     }
 
     @NotNull
-    default TagEntry<Enchantment> getTagEntry() {
-        return TagEntry.valueEntry(TypedKey.create(RegistryKey.ENCHANTMENT, getKey()));
+    public TagEntry<Enchantment> getTagEntry() {
+        return TagEntry.valueEntry(TypedKey.create(RegistryKey.ENCHANTMENT, key));
     }
 
     /**
      * Get block tags to register to use for this enchantment and what tags/blocks it should contain
      */
     @NotNull
-    default Map<Key, Set<TagEntry<BlockType>>> getBlockTagsToRegister() {
+    public Map<Key, Set<TagEntry<BlockType>>> getBlockTagsToRegister() {
         return ImmutableMap.of();
     }
 
-    static @Nullable ItemStack findFirstWithEnchant(
+    public static @Nullable ItemStack findFirstWithEnchant(
             @NotNull EntityEquipment equipment,
             @NotNull Enchantment enchantment
     ) {

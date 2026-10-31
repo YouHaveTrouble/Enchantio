@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class SoulboundListener implements Listener {
 
@@ -18,12 +19,12 @@ public class SoulboundListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     public void onSoulboundEnchantDeath(PlayerDeathEvent event) {
         if (soulbound == null) return;
-        event.getPlayer().getInventory().forEach(itemStack -> {
-            if (itemStack != null && itemStack.containsEnchantment(soulbound)) {
-                event.getItemsToKeep().add(itemStack);
-                event.getDrops().remove(itemStack);
-            }
-        });
+        for (ItemStack item : event.getPlayer().getInventory()) {
+            if (item == null) continue;
+            if (!item.containsEnchantment(soulbound)) continue;
+            event.getItemsToKeep().add(item);
+            event.getDrops().remove(item);
+        }
     }
 
 }

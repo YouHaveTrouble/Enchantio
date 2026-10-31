@@ -6,7 +6,6 @@ import io.papermc.paper.registry.RegistryKey;
 import me.youhavetrouble.enchantio.Enchantio;
 import me.youhavetrouble.enchantio.EnchantioConfig;
 import me.youhavetrouble.enchantio.enchants.CloakingEnchant;
-import me.youhavetrouble.enchantio.enchants.ExecutionerEnchant;
 import org.bukkit.Bukkit;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
@@ -29,7 +28,7 @@ public class CloakingListener implements Listener {
     private final HashMap<UUID, Integer> ticksSinceLastMovement = new HashMap<>();
 
     private final CloakingEnchant cloakingEnchant = (CloakingEnchant) EnchantioConfig.ENCHANTS.get(CloakingEnchant.KEY);
-    private final PotionEffect cloakingEffect = new PotionEffect(PotionEffectType.INVISIBILITY,  3, 0, false, false, false);
+    private final PotionEffect cloakingEffect = new PotionEffect(PotionEffectType.INVISIBILITY, 3, 0, false, false, false);
 
     private final Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
     private final Enchantment cloaking = registry.get(CloakingEnchant.KEY);
@@ -46,8 +45,10 @@ public class CloakingListener implements Listener {
                 int cloakingLevel = Enchantio.getSumOfEnchantLevels(player.getEquipment(), cloaking);
                 if (cloakingLevel == 0) continue;
                 ticksSinceLastMovement.computeIfPresent(player.getUniqueId(), (uuid, ticks) -> ticks + 1);
-                if (ticksSinceLastMovement.getOrDefault(player.getUniqueId(), 0) < cloakingEnchant.getTicksToActivate()) continue;
-                player.getScheduler().execute(enchantio, () -> player.addPotionEffect(cloakingEffect), () -> {}, 1);
+                if (ticksSinceLastMovement.getOrDefault(player.getUniqueId(), 0) < cloakingEnchant.ticksToActivate)
+                    continue;
+                player.getScheduler().execute(enchantio, () -> player.addPotionEffect(cloakingEffect), () -> {
+                }, 1);
             }
         }, 1, 1);
     }
@@ -77,9 +78,6 @@ public class CloakingListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         ticksSinceLastMovement.put(event.getPlayer().getUniqueId(), 0);
     }
-
-
-
 
 
 }

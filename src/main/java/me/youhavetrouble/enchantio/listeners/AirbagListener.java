@@ -34,7 +34,7 @@ public class AirbagListener implements Listener {
         if (levels == 0) return;
 
         AirbagEnchant airbagEnchant = (AirbagEnchant) EnchantioConfig.ENCHANTS.get(AirbagEnchant.KEY);
-        double percentageDamageReduction = Math.min(1, levels * airbagEnchant.getDamageReductionPerLevel());
+        double percentageDamageReduction = Math.min(1, levels * airbagEnchant.damageReductionPerLevel);
         event.setDamage(damage * (1 - percentageDamageReduction));
     }
 

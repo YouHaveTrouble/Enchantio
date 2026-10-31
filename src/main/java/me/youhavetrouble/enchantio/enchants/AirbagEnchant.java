@@ -10,23 +10,16 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
-public class AirbagEnchant implements EnchantioEnchant {
+public class AirbagEnchant extends EnchantioEnchant {
 
     public static final Key KEY = Key.key("enchantio:airbag");
 
-    private final int anvilCost, weight, maxLevel;
-    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
-    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
-    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
-    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
-    private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
-    private final double damageReductionPerLevel;
+    public final double damageReductionPerLevel;
 
     private AirbagEnchant(
             int anvilCost,
@@ -40,75 +33,21 @@ public class AirbagEnchant implements EnchantioEnchant {
             int maxLevel,
             double damageReductionPerLevel
     ) {
-        this.anvilCost = anvilCost;
-        this.weight = weight;
-        this.maxLevel = maxLevel;
-        this.minimumCost = minimumCost;
-        this.maximumCost = maximumCost;
-        this.supportedItemTags.addAll(supportedItemTags);
+        super(
+                KEY,
+                Component.translatable("enchantio.enchant.airbag", "Airbag"),
+                anvilCost,
+                maxLevel,
+                weight,
+                minimumCost,
+                maximumCost,
+                activeSlots,
+                supportedItemTags,
+                enchantTagKeys,
+                exclusiveTagKeys
+        );
         this.damageReductionPerLevel = damageReductionPerLevel;
-        this.activeSlots.addAll(activeSlots);
-        this.enchantTagKeys.addAll(enchantTagKeys);
-        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
-    }
 
-    @Override
-    public @NotNull Key getKey() {
-        return KEY;
-    }
-
-    @Override
-    public @NotNull Component getDescription() {
-        return Component.translatable("enchantio.enchant.airbag", "Airbag");
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return anvilCost;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
-        return minimumCost;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
-        return maximumCost;
-    }
-
-    @Override
-    public @NotNull Iterable<EquipmentSlotGroup> getActiveSlots() {
-        return activeSlots;
-    }
-
-    @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return supportedItemTags;
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getEnchantTagKeys() {
-        return Collections.unmodifiableSet(enchantTagKeys);
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
-        return Collections.unmodifiableSet(exclusiveTagKeys);
-    }
-
-    public double getDamageReductionPerLevel() {
-        return damageReductionPerLevel;
     }
 
     public static AirbagEnchant create(ConfigurationSection configurationSection) {
@@ -152,7 +91,7 @@ public class AirbagEnchant implements EnchantioEnchant {
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
-            EnchantioConfig.ENCHANTS.put(airbagEnchant.getKey(), airbagEnchant);
+            EnchantioConfig.ENCHANTS.put(airbagEnchant.key, airbagEnchant);
         }
 
         return airbagEnchant;

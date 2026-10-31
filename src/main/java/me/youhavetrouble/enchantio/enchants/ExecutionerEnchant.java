@@ -10,28 +10,20 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
 
-import static me.youhavetrouble.enchantio.EnchantioConfig.ENCHANTS;
+import java.util.Collection;
+import java.util.List;
+
 
 @SuppressWarnings("UnstableApiUsage")
-public class ExecutionerEnchant implements EnchantioEnchant {
+public class ExecutionerEnchant extends EnchantioEnchant {
 
     public static final Key KEY = Key.key("enchantio:executioner");
 
-    private final int anvilCost, weight, maxLevel;
-    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
-    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
-    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
-    private final double damageMultiplierPerLevel, maxDamageHpThreshold;
-    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
-    private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
+    public final double damageMultiplierPerLevel, maxDamageHpThreshold;
 
-
-    public ExecutionerEnchant(
+    private ExecutionerEnchant(
             int anvilCost,
             int weight,
             EnchantmentRegistryEntry.EnchantmentCost minimumCost,
@@ -44,80 +36,21 @@ public class ExecutionerEnchant implements EnchantioEnchant {
             double damageMultiplierPerLevel,
             double maxDamageHpThreshold
     ) {
-        this.anvilCost = anvilCost;
-        this.weight = weight;
-        this.minimumCost = minimumCost;
-        this.maximumCost = maximumCost;
-        this.supportedItemTags.addAll(supportedItemTags);
-        this.maxLevel = maxLevel;
-        this.activeSlots.addAll(activeSlots);
+        super(
+                KEY,
+                Component.translatable("enchantio.enchant.executioner","Executioner"),
+                anvilCost,
+                maxLevel,
+                weight,
+                minimumCost,
+                maximumCost,
+                activeSlots,
+                supportedItemTags,
+                enchantTagKeys,
+                exclusiveTagKeys
+        );
         this.damageMultiplierPerLevel = damageMultiplierPerLevel;
         this.maxDamageHpThreshold = maxDamageHpThreshold;
-        this.enchantTagKeys.addAll(enchantTagKeys);
-        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
-    }
-
-    @Override
-    public @NotNull Key getKey() {
-        return KEY;
-    }
-
-    @Override
-    public @NotNull Component getDescription() {
-        return Component.translatable("enchantio.enchant.executioner","Executioner");
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return anvilCost;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    public double getDamageMultiplierPerLevel() {
-        return damageMultiplierPerLevel;
-    }
-
-    public double getMaxDamageHpThreshold() {
-        return maxDamageHpThreshold;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
-        return minimumCost;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
-        return maximumCost;
-    }
-
-    @Override
-    public @NotNull Iterable<EquipmentSlotGroup> getActiveSlots() {
-        return activeSlots;
-    }
-
-    @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return supportedItemTags;
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getEnchantTagKeys() {
-        return Collections.unmodifiableSet(enchantTagKeys);
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
-        return Collections.unmodifiableSet(exclusiveTagKeys);
     }
 
     public static ExecutionerEnchant create(ConfigurationSection configurationSection) {
@@ -162,7 +95,7 @@ public class ExecutionerEnchant implements EnchantioEnchant {
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
-            ENCHANTS.put(ExecutionerEnchant.KEY, executionerEnchant);
+            EnchantioConfig.ENCHANTS.put(ExecutionerEnchant.KEY, executionerEnchant);
         }
 
         return executionerEnchant;

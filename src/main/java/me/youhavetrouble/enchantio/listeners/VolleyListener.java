@@ -41,9 +41,9 @@ public class VolleyListener implements Listener {
         int level = bow.getEnchantmentLevel(volley);
         if (level <= 0) return;
         if (!(EnchantioConfig.ENCHANTS.get(VolleyEnchant.KEY) instanceof VolleyEnchant volleyEnchant)) return;
-        double spread = volleyEnchant.getSpread();
+        double spread = volleyEnchant.spread;
         if (projectileEntity instanceof Arrow arrow) {
-            for (int i = 0; i < level * volleyEnchant.getAdditionalArrowsPerLevel(); i++) {
+            for (int i = 0; i < level * volleyEnchant.additionalArrowsPerLevel; i++) {
                 Vector velocity = arrow.getVelocity();
                 double spreadX = (random.nextDouble() - 0.5) * spread;
                 double spreadY = (random.nextDouble() - 0.5) * spread;

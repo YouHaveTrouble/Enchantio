@@ -44,7 +44,7 @@ public class EnchantioBootstrap implements PluginBootstrap {
                 if (EnchantioConfig.DEBUG) logger.info("Registering item tag {}", enchant.getTagForSupportedItems().key());
                 event.registrar().addToTag(
                         ItemTypeTagKeys.create(enchant.getTagForSupportedItems().key()),
-                        enchant.getSupportedItems()
+                        enchant.supportedItems
                 );
             }
         }));
@@ -63,8 +63,8 @@ public class EnchantioBootstrap implements PluginBootstrap {
 
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler((event) -> {
             for (EnchantioEnchant enchant : enchantioEnchants) {
-                for (var tagKey : enchant.getEnchantTagKeys()) {
-                    if (EnchantioConfig.DEBUG) logger.info("Adding enchantment {} to tag {}", enchant.getKey(), tagKey.key());
+                for (var tagKey : enchant.enchantTagKeys) {
+                    if (EnchantioConfig.DEBUG) logger.info("Adding enchantment {} to tag {}", enchant.key, tagKey.key());
                     event.registrar().addToTag(
                             tagKey,
                             Set.of(enchant.getTagEntry())
@@ -72,7 +72,7 @@ public class EnchantioBootstrap implements PluginBootstrap {
                 }
 
                 Set<TagEntry<Enchantment>> entries = new HashSet<>();
-                for (var e : enchant.getExclusiveTagKeys()) {
+                for (var e : enchant.exclusiveTagKeys) {
                     entries.add(TagEntry.tagEntry(e));
                 }
 
@@ -86,15 +86,15 @@ public class EnchantioBootstrap implements PluginBootstrap {
 
         context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.compose().newHandler(event -> {
             for (EnchantioEnchant enchant : enchantioEnchants) {
-                if (EnchantioConfig.DEBUG) logger.info("Registering enchantment {}", enchant.getKey());
-                event.registry().register(TypedKey.create(RegistryKey.ENCHANTMENT, enchant.getKey()), enchantment -> {
-                    enchantment.description(enchant.getDescription());
-                    enchantment.anvilCost(enchant.getAnvilCost());
-                    enchantment.maxLevel(enchant.getMaxLevel());
-                    enchantment.weight(enchant.getWeight());
-                    enchantment.minimumCost(enchant.getMinimumCost());
-                    enchantment.maximumCost(enchant.getMaximumCost());
-                    enchantment.activeSlots(enchant.getActiveSlots());
+                if (EnchantioConfig.DEBUG) logger.info("Registering enchantment {}", enchant.key);
+                event.registry().register(TypedKey.create(RegistryKey.ENCHANTMENT, enchant.key), enchantment -> {
+                    enchantment.description(enchant.description);
+                    enchantment.anvilCost(enchant.anvilCost);
+                    enchantment.maxLevel(enchant.maxLevel);
+                    enchantment.weight(enchant.weight);
+                    enchantment.minimumCost(enchant.minimumCost);
+                    enchantment.maximumCost(enchant.maximumCost);
+                    enchantment.activeSlots(enchant.activeSlots);
                     enchantment.supportedItems(event.getOrCreateTag(enchant.getTagForSupportedItems()));
                     enchantment.exclusiveWith(event.getOrCreateTag(enchant.getTagForExclusiveEnchants()));
                 });

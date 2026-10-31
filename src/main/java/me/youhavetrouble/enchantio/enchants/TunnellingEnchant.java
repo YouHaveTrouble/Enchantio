@@ -15,23 +15,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static me.youhavetrouble.enchantio.EnchantioConfig.ENCHANTS;
-
 @SuppressWarnings("UnstableApiUsage")
-public class TunnellingEnchant implements EnchantioEnchant {
+public class TunnellingEnchant extends EnchantioEnchant {
 
     public static final Key KEY = Key.key("enchantio", "tunnelling");
 
     public static final Key AFFECTED_BLOCKS_KEY = Key.key("enchantio", "affected_by_tunnelling");
 
-    private final int anvilCost, weight, maxLevel, blocksPerLevel;
-    private final boolean visualizeBreaking;
-    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
-    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
-    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
-    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
-    private final Map<Key, Set<TagEntry<BlockType>>> affectedBlockTags = new HashMap<>();
+    public final int  blocksPerLevel;
+    public final boolean visualizeBreaking;
+    public final Map<Key, Set<TagEntry<BlockType>>> affectedBlockTags;
+
 
     private TunnellingEnchant(
             int anvilCost,
@@ -46,85 +40,27 @@ public class TunnellingEnchant implements EnchantioEnchant {
             int blocksPerLevel,
             boolean visualizeBreaking
     ) {
-        this.anvilCost = anvilCost;
-        this.weight = weight;
-        this.minimumCost = minimumCost;
-        this.maximumCost = maximumCost;
-        this.maxLevel = maxLevel;
+        super(
+                KEY,
+                Component.translatable("enchantio.enchant.tunnelling", "Tunnelling"),
+                anvilCost,
+                maxLevel,
+                weight,
+                minimumCost,
+                maximumCost,
+                Set.of(EquipmentSlotGroup.MAINHAND),
+                supportedItemTags,
+                enchantTagKeys,
+                exclusiveTagKeys
+        );
+        this.affectedBlockTags = Collections.unmodifiableMap(affectedBlockTags);
         this.blocksPerLevel = blocksPerLevel;
         this.visualizeBreaking = visualizeBreaking;
-        this.supportedItemTags.addAll(supportedItemTags);
-        this.enchantTagKeys.addAll(enchantTagKeys);
-        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
-        this.affectedBlockTags.putAll(affectedBlockTags);
-    }
-
-    @Override
-    public @NotNull Key getKey() {
-        return KEY;
-    }
-
-    @Override
-    public @NotNull Component getDescription() {
-        return Component.translatable("enchantio.enchant.tunnelling", "Tunnelling");
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return anvilCost;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
-        return minimumCost;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
-        return maximumCost;
-    }
-
-    @Override
-    public @NotNull Iterable<EquipmentSlotGroup> getActiveSlots() {
-        return Set.of(EquipmentSlotGroup.MAINHAND);
-    }
-
-    @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return supportedItemTags;
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getEnchantTagKeys() {
-        return Collections.unmodifiableSet(enchantTagKeys);
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
-        return Collections.unmodifiableSet(exclusiveTagKeys);
     }
 
     @Override
     public @NotNull Map<Key, Set<TagEntry<BlockType>>> getBlockTagsToRegister() {
         return affectedBlockTags;
-    }
-
-    public int getBlocksPerLevel() {
-        return blocksPerLevel;
-    }
-
-    public boolean shouldVisualizeBreaking() {
-        return visualizeBreaking;
     }
 
     public static TunnellingEnchant create(ConfigurationSection configurationSection) {
@@ -181,7 +117,7 @@ public class TunnellingEnchant implements EnchantioEnchant {
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
-            ENCHANTS.put(TunnellingEnchant.KEY, tunnellingEnchant);
+            EnchantioConfig.ENCHANTS.put(TunnellingEnchant.KEY, tunnellingEnchant);
         }
 
         return tunnellingEnchant;

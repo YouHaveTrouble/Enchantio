@@ -30,7 +30,7 @@ public class TelepathyListener implements Listener {
         if (!tool.containsEnchantment(telepathy)) return;
         for (Item item : event.getItems()) {
             item.setPickupDelay(0);
-            if (!telepathyEnchant.isOnlyUserCanPickupItems()) continue;
+            if (!telepathyEnchant.onlyUserCanPickupItems) continue;
             item.setOwner(event.getPlayer().getUniqueId());
         }
 

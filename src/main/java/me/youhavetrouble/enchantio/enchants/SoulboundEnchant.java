@@ -10,23 +10,15 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-
-import static me.youhavetrouble.enchantio.EnchantioConfig.ENCHANTS;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("UnstableApiUsage")
-public class SoulboundEnchant implements EnchantioEnchant {
+public class SoulboundEnchant extends EnchantioEnchant {
 
     public static final Key KEY = Key.key("enchantio:soulbound");
-
-    private final int anvilCost, weight;
-    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
-    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
-    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
-    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
 
     public SoulboundEnchant(
             int anvilCost,
@@ -37,68 +29,19 @@ public class SoulboundEnchant implements EnchantioEnchant {
             Collection<TagKey<Enchantment>> exclusiveTagKeys,
             Collection<TagEntry<ItemType>> supportedItemTags
     ) {
-        this.anvilCost = anvilCost;
-        this.weight = weight;
-        this.minimumCost = minimumCost;
-        this.maximumCost = maximumCost;
-        this.supportedItemTags.addAll(supportedItemTags);
-        this.enchantTagKeys.addAll(enchantTagKeys);
-        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
-    }
-
-    @Override
-    public @NotNull Key getKey() {
-        return KEY;
-    }
-
-    @Override
-    public @NotNull Component getDescription() {
-        return Component.translatable("enchantio.enchant.soulbound", "Soulbound");
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return anvilCost;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
-        return minimumCost;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
-        return maximumCost;
-    }
-
-    @Override
-    public @NotNull Iterable<EquipmentSlotGroup> getActiveSlots() {
-        return Set.of(EquipmentSlotGroup.ANY);
-    }
-
-    @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return supportedItemTags;
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getEnchantTagKeys() {
-        return Collections.unmodifiableSet(enchantTagKeys);
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
-        return Collections.unmodifiableSet(exclusiveTagKeys);
+        super(
+                KEY,
+                Component.translatable("enchantio.enchant.soulbound", "Soulbound"),
+                anvilCost,
+                1,
+                weight,
+                minimumCost,
+                maximumCost,
+                Set.of(EquipmentSlotGroup.ANY),
+                supportedItemTags,
+                enchantTagKeys,
+                exclusiveTagKeys
+        );
     }
 
     public static SoulboundEnchant create(ConfigurationSection configurationSection) {
@@ -135,7 +78,7 @@ public class SoulboundEnchant implements EnchantioEnchant {
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
-            ENCHANTS.put(SoulboundEnchant.KEY, soulboundEnchant);
+            EnchantioConfig.ENCHANTS.put(SoulboundEnchant.KEY, soulboundEnchant);
         }
 
         return soulboundEnchant;

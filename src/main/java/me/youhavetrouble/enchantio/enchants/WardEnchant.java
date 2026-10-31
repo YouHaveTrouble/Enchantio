@@ -10,25 +10,17 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-
-import static me.youhavetrouble.enchantio.EnchantioConfig.ENCHANTS;
+import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
-public class WardEnchant implements EnchantioEnchant {
+public class WardEnchant extends EnchantioEnchant {
 
     public static final Key KEY = Key.key("enchantio:ward");
 
-    private final int anvilCost, weight, cooldownTicks;
-    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
-    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
-    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
-    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
-    private final Set<TagKey<Enchantment>> exclusiveTagKeys = new HashSet<>();
-    private final Set<EquipmentSlotGroup> activeSlots = new HashSet<>();
-    private final String blockSound;
+    public final int cooldownTicks;
+    public final String blockSound;
 
     public WardEnchant(
             int anvilCost,
@@ -42,79 +34,21 @@ public class WardEnchant implements EnchantioEnchant {
             int cooldownTicks,
             String blockSound
     ) {
-        this.anvilCost = anvilCost;
-        this.weight = weight;
-        this.minimumCost = minimumCost;
-        this.maximumCost = maximumCost;
-        this.supportedItemTags.addAll(supportedItemTags);
-        this.activeSlots.addAll(activeSlots);
+        super(
+                KEY,
+                Component.translatable("enchantio.enchant.ward", "Ward"),
+                anvilCost,
+                1,
+                weight,
+                minimumCost,
+                maximumCost,
+                activeSlots,
+                supportedItemTags,
+                enchantTagKeys,
+                exclusiveTagKeys
+        );
         this.cooldownTicks = cooldownTicks;
         this.blockSound = blockSound;
-        this.enchantTagKeys.addAll(enchantTagKeys);
-        this.exclusiveTagKeys.addAll(exclusiveTagKeys);
-    }
-
-    @Override
-    public @NotNull Key getKey() {
-        return KEY;
-    }
-
-    @Override
-    public @NotNull Component getDescription() {
-        return Component.translatable("enchantio.enchant.ward", "Ward");
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return anvilCost;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
-        return minimumCost;
-    }
-
-    @Override
-    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
-        return maximumCost;
-    }
-
-    @Override
-    public @NotNull Iterable<EquipmentSlotGroup> getActiveSlots() {
-        return activeSlots;
-    }
-
-    @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return supportedItemTags;
-    }
-
-    public int getCooldownTicks() {
-        return cooldownTicks;
-    }
-
-    public @NotNull String getBlockSound() {
-        return blockSound;
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getEnchantTagKeys() {
-        return Collections.unmodifiableSet(enchantTagKeys);
-    }
-
-    @Override
-    public @NotNull Set<TagKey<Enchantment>> getExclusiveTagKeys() {
-        return Collections.unmodifiableSet(exclusiveTagKeys);
     }
 
     public static WardEnchant create(ConfigurationSection configurationSection) {
@@ -158,7 +92,7 @@ public class WardEnchant implements EnchantioEnchant {
         );
 
         if (EnchantioConfig.getBoolean(configurationSection, "enabled", true)) {
-            ENCHANTS.put(WardEnchant.KEY, wardEnchant);
+            EnchantioConfig.ENCHANTS.put(WardEnchant.KEY, wardEnchant);
         }
 
         return wardEnchant;

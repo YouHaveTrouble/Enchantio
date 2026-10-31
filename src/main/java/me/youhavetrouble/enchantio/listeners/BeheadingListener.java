@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 
 
-@SuppressWarnings("UnstableApiUsage")
 public class BeheadingListener implements Listener {
 
     private final Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
@@ -48,7 +47,7 @@ public class BeheadingListener implements Listener {
         int level = Enchantio.getHighestEnchantLevel(killerEquipment, beheading);
         if (level == 0) return;
 
-        double chance = level * beheadingEnchant.getChanceToDropHeadPerLevel();
+        double chance = level * beheadingEnchant.chanceToDropHeadPerLevel;
 
         if (ThreadLocalRandom.current().nextDouble() > chance) return;
 

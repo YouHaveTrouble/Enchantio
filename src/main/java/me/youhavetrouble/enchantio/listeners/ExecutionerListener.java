@@ -19,8 +19,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.jetbrains.annotations.NotNull;
 
-
-@SuppressWarnings("UnstableApiUsage")
 public class ExecutionerListener implements Listener {
 
     private final Registry<@NotNull Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
@@ -50,8 +48,8 @@ public class ExecutionerListener implements Listener {
 
         double targetHealthPercentage = livingEntity.getHealth() / targetMaxHealth;
 
-        if (targetHealthPercentage < executionerEnchant.getMaxDamageHpThreshold()) {
-            double damageMultiplier = 1 + (executionerEnchant.getDamageMultiplierPerLevel() * level);
+        if (targetHealthPercentage < executionerEnchant.maxDamageHpThreshold) {
+            double damageMultiplier = 1 + (executionerEnchant.damageMultiplierPerLevel * level);
             event.setDamage(event.getDamage() * damageMultiplier);
         }
 
