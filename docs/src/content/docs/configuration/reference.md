@@ -85,13 +85,20 @@ It will also come with warnings in the console. It's not recommended to disable 
 use.
 :::
 
-#### maxLevel
+### maxLevel
 
 - **Type**: `int`
 
 Maximum level of the enchantment. If set to 1, the enchantment will be a single level enchantment. If this option is not
 in the configuration section for specific enchantment, it means it's locked to a single level enchantment, because logic
 of the enchantment does not support multiple levels.
+
+### exclusiveTags
+
+- **Type**: [`Enchantment Tags`](/configuration/input-types/#enchantment-tag)
+
+Enchantments and tags that this enchant will be exclusive with. Exclusive enchants cannot exist at once on a single
+item.
 
 ## Telepathy
 
