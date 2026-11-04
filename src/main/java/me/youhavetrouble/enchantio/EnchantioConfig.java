@@ -8,6 +8,7 @@ import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.TagEntry;
 import me.youhavetrouble.enchantio.enchants.*;
+import me.youhavetrouble.enchantio.forceenchantable.ForceEnchantable;
 import net.kyori.adventure.key.Key;
 import org.bukkit.block.BlockType;
 import org.bukkit.configuration.ConfigurationSection;
@@ -29,6 +30,8 @@ public class EnchantioConfig {
     public static final Map<Key, EnchantioEnchant> ENCHANTS = new HashMap<>();
     public static boolean DEBUG = false;
     private static boolean initialized = false;
+
+    private static ForceEnchantable forceEnchantable;
 
     protected static void init(Path filePath) throws IOException {
         if (initialized) {
@@ -98,7 +101,13 @@ public class EnchantioConfig {
         ConfigurationSection insomniaSection = getConfigSection(cursesSection, "insomnia");
         InsomniaEnchant.create(insomniaSection);
 
+        forceEnchantable = new ForceEnchantable(configuration);
+
         configuration.save(configFile);
+    }
+
+    public static ForceEnchantable getForceEnchantable() {
+        return forceEnchantable;
     }
 
     public static List<String> getStringList(ConfigurationSection section, String key, List<String> defaultValue) {
