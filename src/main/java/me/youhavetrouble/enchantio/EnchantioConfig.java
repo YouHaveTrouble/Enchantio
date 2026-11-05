@@ -158,7 +158,7 @@ public class EnchantioConfig {
         for (String sectionKey : section.getKeys(false)) {
             ConfigurationSection enchantSection = section.getConfigurationSection(sectionKey);
             if (enchantSection == null) continue;
-            if (!enchantSection.isSet("canGetFromEnchantingTable") || enchantSection.isSet("enchantmentTags")) return;
+            if (!enchantSection.isSet("canGetFromEnchantingTable") || enchantSection.isSet("enchantmentTags")) continue;
             boolean canGetFromEnchantingTable = section.getBoolean("canGetFromEnchantingTable", true);
             section.set("enchantmentTags", canGetFromEnchantingTable ? List.of("#in_enchanting_table") : List.of());
         }
