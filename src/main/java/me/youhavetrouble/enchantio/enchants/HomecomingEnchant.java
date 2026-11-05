@@ -64,7 +64,7 @@ public class HomecomingEnchant extends EnchantioEnchant {
                 )),
                 EnchantioConfig.getEnchantmentTagKeysFromList(EnchantioConfig.getStringList(
                         configurationSection,
-                        "excusiveTags",
+                        "exclusiveTags",
                         List.of()
                 )),
                 EnchantioConfig.getItemTagEntriesFromList(EnchantioConfig.getStringList(
