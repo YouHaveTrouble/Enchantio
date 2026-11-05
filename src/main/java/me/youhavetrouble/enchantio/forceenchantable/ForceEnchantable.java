@@ -27,7 +27,13 @@ public class ForceEnchantable implements Listener {
 
         ConfigurationSection pairs = EnchantioConfig.getConfigSection(section, "items");
         for (String key : pairs.getKeys(false)) {
-            ItemType type = Registry.ITEM.get(Key.key(key));
+            ItemType type;
+            try {
+                type = Registry.ITEM.get(Key.key(key));
+            } catch (IllegalArgumentException e) {
+                Enchantio.getPlugin(Enchantio.class).getSLF4JLogger().warn("Failed to add force-enchantable item {}. Invalid item key. Skipping.", key);
+                continue;
+            }
             if (type == null) {
                 Enchantio.getPlugin(Enchantio.class).getSLF4JLogger().warn("Failed to add force-enchantable item {}. Invalid item type. Skipping.", key);
                 continue;
