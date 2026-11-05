@@ -218,7 +218,6 @@ public class EnchantioConfig {
             }
             try {
                 Key key = Key.key(enchantmentTag);
-                TypedKey<Enchantment> typedKey = TypedKey.create(RegistryKey.ENCHANTMENT, key);
                 TagKey<Enchantment> tagKey = EnchantmentTagKeys.create(key);
                 enchantTagKeys.add(tagKey);
             } catch (IllegalArgumentException | NullPointerException ignored) {
