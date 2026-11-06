@@ -1,18 +1,26 @@
 package me.youhavetrouble.enchantio.forceenchantable;
 
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Enchantable;
 import me.youhavetrouble.enchantio.Enchantio;
 import me.youhavetrouble.enchantio.EnchantioConfig;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@SuppressWarnings("UnstableApiUsage")
 public class ForceEnchantable implements Listener {
 
     public final Map<ItemType, Integer> enchantableness;
@@ -47,8 +55,40 @@ public class ForceEnchantable implements Listener {
         }
 
         this.enchantableness = Collections.unmodifiableMap(enchantableness);
-        // TODO decide if items should just globally get enchantable component or only give it to items actively in
-        //  enchant table item slot
+        if (!enabled) return;
+
+        Enchantio plugin = Enchantio.getPlugin(Enchantio.class);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    private void applyEnchantable(ItemStack itemStack) {
+        if (itemStack == null) return;
+        if (!enchantableness.containsKey(itemStack.getType().asItemType())) return;
+        int value = enchantableness.get(itemStack.getType().asItemType());
+        if (value < 0) {
+            itemStack.unsetData(DataComponentTypes.ENCHANTABLE);
+            return;
+        }
+        itemStack.setData(DataComponentTypes.ENCHANTABLE, Enchantable.enchantable(value));
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEnchantableInInventory(InventoryOpenEvent event) {
+        for (ItemStack itemStack : event.getInventory().getStorageContents()) {
+            applyEnchantable(itemStack);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEnchantablePlayerJoin(PlayerJoinEvent event) {
+        for (ItemStack itemStack : event.getPlayer().getInventory().getContents()) {
+            applyEnchantable(itemStack);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEnchantableItemDrop(ItemSpawnEvent event) {
+        applyEnchantable(event.getEntity().getItemStack());
     }
 
 }
