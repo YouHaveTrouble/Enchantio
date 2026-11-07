@@ -3,8 +3,13 @@ title: Configuration reference
 description: Comprehensive reference of all configuration options available in Enchantio
 ---
 
+## debug
 
-## Common options
+- **Type**: `boolean`
+
+Enables verbose logging of enchant and tag registration. Can be used for debugging configuration issues.
+
+## Common enchant options
 
 Options that are available for all (or most) enchantments and are required for the enchantment to work.
 
@@ -190,3 +195,34 @@ Display visualisation of blocks being broken by the enchantment along with break
 - **Type**: `double`
 
 Chance of the enchantment to activate when player takes damage.
+
+## force-enchantable
+
+Allows overriding the enchantability of specific item types by giving them
+<a href="https://minecraft.wiki/w/Data_component_format#enchantable" target="_blank">enchantable component</a>. This
+allows players to enchant items that normally do not get any options in enchanting table like totems or elytra.
+
+:::caution
+This feature is **DESTRUCTIVE**. This means it will modify existing items and the effect is irreversible if you remove
+the plugin later. All modified items will keep their enchantability.
+:::
+
+### enabled
+
+- **Type**: `boolean`
+
+Enables or disables the feature.
+
+### items
+
+- **Type**: `Pairs of`[`item ids`](/configuration/input-types/#item-reference)`and enchantability values`
+
+**Example:**
+```yml
+items:
+  totem_of_undying: 1
+  elytra: 1
+```
+
+Positive values will set given item types enchantability value. Negative values will remove enchantability from the
+item, even if the item is normally enchantable.
