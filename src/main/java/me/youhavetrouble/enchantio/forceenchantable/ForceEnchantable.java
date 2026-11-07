@@ -55,10 +55,6 @@ public class ForceEnchantable implements Listener {
         }
 
         this.enchantableness = Collections.unmodifiableMap(enchantableness);
-        if (!enabled) return;
-
-        Enchantio plugin = Enchantio.getPlugin(Enchantio.class);
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     private void applyEnchantable(ItemStack itemStack) {

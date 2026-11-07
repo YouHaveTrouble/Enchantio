@@ -61,6 +61,10 @@ public final class Enchantio extends JavaPlugin {
         if (EnchantioConfig.ENCHANTS.containsKey(InsomniaEnchant.KEY)) {
             getServer().getPluginManager().registerEvents(new InsomniaListener(), this);
         }
+
+        if (EnchantioConfig.getForceEnchantable().enabled) {
+            getServer().getPluginManager().registerEvents(EnchantioConfig.getForceEnchantable(), this);
+        }
     }
 
     @Override
