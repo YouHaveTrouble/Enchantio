@@ -56,7 +56,7 @@ public class WardEnchant extends EnchantioEnchant {
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 12),
                 EnchantioConfig.getInt(configurationSection, "weight", 2),
                 EnchantmentRegistryEntry.EnchantmentCost.of(
-                        EnchantioConfig.getInt(configurationSection, "minimumCost.base", 35),
+                        EnchantioConfig.getInt(configurationSection, "minimumCost.base", 15),
                         EnchantioConfig.getInt(configurationSection, "minimumCost.additionalPerLevel", 1)
                 ),
                 EnchantmentRegistryEntry.EnchantmentCost.of(
@@ -87,7 +87,7 @@ public class WardEnchant extends EnchantioEnchant {
                                 "OFFHAND"
                         )
                 )),
-                EnchantioConfig.getInt(configurationSection, "cooldownTicks", 40),
+                EnchantioConfig.getInt(configurationSection, "cooldownTicks", 15),
                 EnchantioConfig.getString(configurationSection, "blockSound", "minecraft:item.shield.block")
         );
 

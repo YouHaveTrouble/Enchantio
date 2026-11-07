@@ -56,7 +56,7 @@ public class BeheadingEnchant extends EnchantioEnchant {
                 EnchantioConfig.getInt(configurationSection, "anvilCost", 1),
                 EnchantioConfig.getInt(configurationSection, "weight", 1),
                 EnchantmentRegistryEntry.EnchantmentCost.of(
-                        EnchantioConfig.getInt(configurationSection, "minimumCost.base", 40),
+                        EnchantioConfig.getInt(configurationSection, "minimumCost.base", 20),
                         EnchantioConfig.getInt(configurationSection, "minimumCost.additionalPerLevel", 3)
                 ),
                 EnchantmentRegistryEntry.EnchantmentCost.of(
