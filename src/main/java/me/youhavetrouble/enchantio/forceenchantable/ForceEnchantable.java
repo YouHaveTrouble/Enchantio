@@ -32,7 +32,12 @@ public class ForceEnchantable implements Listener {
 
         enabled = EnchantioConfig.getBoolean(section, "enabled", false);
 
-        ConfigurationSection pairs = EnchantioConfig.getConfigSection(section, "items");
+        ConfigurationSection pairs = EnchantioConfig.getConfigSection(section, "items",
+                Map.of(
+                        "totem_of_undying", 1,
+                        "elytra", 1
+                )
+        );
 
         for (String key : pairs.getKeys(false)) {
             try {
@@ -64,6 +69,9 @@ public class ForceEnchantable implements Listener {
                 continue;
             }
             enchantableness.put(type, value);
+            if (EnchantioConfig.DEBUG) {
+                Enchantio.getPlugin(Enchantio.class).getSLF4JLogger().info("Overriding enchantability of {} to {}", key, value);
+            }
         }
 
         this.enchantableness = Collections.unmodifiableMap(enchantableness);
