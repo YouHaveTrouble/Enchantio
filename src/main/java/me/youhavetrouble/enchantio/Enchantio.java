@@ -63,6 +63,7 @@ public final class Enchantio extends JavaPlugin {
         }
 
         if (EnchantioConfig.getForceEnchantable().enabled) {
+            EnchantioConfig.getForceEnchantable().init();
             getServer().getPluginManager().registerEvents(EnchantioConfig.getForceEnchantable(), this);
         }
     }

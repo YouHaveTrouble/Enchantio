@@ -252,12 +252,21 @@ public class EnchantioConfig {
         return blockTagKeys;
     }
 
-    public static ConfigurationSection getConfigSection(ConfigurationSection section, String key) {
+    public static ConfigurationSection getConfigSection(ConfigurationSection section, String key, Map<String, Object> defaults) {
         ConfigurationSection value = section.getConfigurationSection(key);
         if (value == null) {
             value = section.createSection(key);
+            if (defaults != null) {
+                for (Map.Entry<String, Object> entry : defaults.entrySet()) {
+                    value.set(entry.getKey(), entry.getValue());
+                }
+            }
         }
         return value;
+    }
+
+    public static ConfigurationSection getConfigSection(ConfigurationSection section, String key) {
+        return getConfigSection(section, key, null);
     }
 
 }

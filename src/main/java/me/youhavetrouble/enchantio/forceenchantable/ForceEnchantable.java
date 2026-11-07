@@ -23,7 +23,8 @@ import java.util.Map;
 @SuppressWarnings("UnstableApiUsage")
 public class ForceEnchantable implements Listener {
 
-    public final Map<ItemType, Integer> enchantableness;
+    private final Map<String, Integer> rawEnchantableness = new HashMap<>();
+    private Map<ItemType, Integer> enchantableness = new HashMap<>();
     public final boolean enabled;
 
     public ForceEnchantable(ConfigurationSection config) {
@@ -31,10 +32,21 @@ public class ForceEnchantable implements Listener {
 
         enabled = EnchantioConfig.getBoolean(section, "enabled", false);
 
-        Map<ItemType, Integer> enchantableness = new HashMap<>();
-
         ConfigurationSection pairs = EnchantioConfig.getConfigSection(section, "items");
+
         for (String key : pairs.getKeys(false)) {
+            try {
+                rawEnchantableness.put(key, pairs.getInt(key));
+            } catch (IllegalArgumentException e) {
+                Enchantio.getPlugin(Enchantio.class).getSLF4JLogger().warn("Failed to parse integer from force-enchantable entry {}. Invalid value. Skipping.", key);
+            }
+        }
+    }
+
+    public void init() {
+        if (rawEnchantableness.size() == enchantableness.size()) return;
+        for (Map.Entry<String, Integer> entry : rawEnchantableness.entrySet()) {
+            String key = entry.getKey();
             ItemType type;
             try {
                 type = Registry.ITEM.get(Key.key(key));
@@ -46,7 +58,7 @@ public class ForceEnchantable implements Listener {
                 Enchantio.getPlugin(Enchantio.class).getSLF4JLogger().warn("Failed to add force-enchantable item {}. Invalid item type. Skipping.", key);
                 continue;
             }
-            int value = pairs.getInt(key);
+            int value = entry.getValue();
             if (value <= 0) {
                 Enchantio.getPlugin(Enchantio.class).getSLF4JLogger().warn("Failed to add force-enchantable item {}. Invalid value {}. Skipping.", key, value);
                 continue;
